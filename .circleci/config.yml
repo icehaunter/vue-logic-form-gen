@@ -1,5 +1,6 @@
 version: 2 # use CircleCI 2.0
 workflows:
+  version: 2
   test:
     jobs:
       - test
