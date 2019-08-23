@@ -1,18 +1,25 @@
 import { LogicalBranch, Level, If, Elif, Switch, For, Field } from './types'
 import { memoize } from 'lodash'
 
-type Context = number[]
+type Context = Array<{
+  splitPoint: string,
+  index: number
+}>
 
 interface PreparedDependentBranch {
   type: 'dependent'
   modelPath: string
-  splitsContext: boolean
+
   resolver: (value: any) => PreparedBranch[] | PreparedBranch | undefined
 }
 
 interface PreparedSimpleBranch {
   type: 'simple'
-  resolver: () => Level | Field
+  resolver: () => PreparedLevel | Field
+}
+
+interface PreparedLevel extends Omit<Level, 'children'> {
+  children: PreparedBranch[]
 }
 
 type PreparedBranch = PreparedDependentBranch | PreparedSimpleBranch
@@ -53,8 +60,7 @@ function prepareIfBranch (branch: If): PreparedBranch {
     resolver: memoize((value: any) => {
       if (branch.predicate(value)) return thenBranch
       else return elseBranch
-    }),
-    splitsContext: false
+    })
   }
 }
 
@@ -76,8 +82,7 @@ function prepareElifBranch (branch: Elif): PreparedBranch {
   return {
     type: 'dependent',
     modelPath: branch.modelPath,
-    resolver,
-    splitsContext: false
+    resolver
   }
 }
 
@@ -104,8 +109,7 @@ function prepareSwitchBranch (branch: Switch): PreparedBranch {
   return {
     type: 'dependent',
     modelPath: branch.modelPath,
-    resolver,
-    splitsContext: false
+    resolver
   }
 }
 
@@ -115,23 +119,25 @@ function prepareForBranch (branch: For): PreparedBranch {
   const resolver = memoize((value: any) => {
     if (Array.isArray(value)) {
       return value.map(() => branchTemplate)
-    } else {
-      return undefined
     }
+
+    return undefined
   })
 
   return {
     type: 'dependent',
     modelPath: branch.modelPath,
-    resolver,
-    splitsContext: true
+    resolver
   }
 }
 
 function prepareLevelBranch (branch: Level): PreparedBranch {
   return {
     type: 'simple',
-    resolver: () => branch
+    resolver: () => ({
+      ...branch,
+      children: branch.children.map(v => prepareBranch(v))
+    })
   }
 }
 
@@ -142,7 +148,7 @@ function prepareField (field: Field): PreparedBranch {
   }
 }
 
-function resolveModelPath (
+export function resolveModelPath (
   modelPath: string | string[],
   model: any,
   context: Context
@@ -150,11 +156,24 @@ function resolveModelPath (
   const copiedContext = [...context]
   const path = Array.isArray(modelPath) ? [...modelPath] : modelPath.split('.')
 
-  return path.reduce((agg, pathPart) => {
-    const resolvedContextPath =
-      pathPart === '$each' ? context.shift() : pathPart
+  return path.reduce((agg, pathPart, currentIndex) => {
+    const pathUntilNow = path.slice(0, currentIndex).join('.')
 
-    return agg && agg[resolvedContextPath as string | number]
+    let resolvedContextPath: string | number | undefined
+
+    if (copiedContext.length && copiedContext[0].splitPoint === pathUntilNow) {
+      const contextPoint = copiedContext.shift()
+
+      if (pathPart === '$each' && contextPoint !== undefined) {
+        resolvedContextPath = contextPoint.index
+      } else {
+        resolvedContextPath = pathPart
+      }
+    } else {
+      resolvedContextPath = pathPart
+    }
+
+    return agg && agg[resolvedContextPath]
   }, model)
 }
 
@@ -170,23 +189,37 @@ function resolveBranch (
     const resolved = branch.resolver(value)
 
     if (Array.isArray(resolved)) {
-      return resolved
-        .flatMap((child, index) => resolveBranch(child, model, [...context, index]))
+      return resolved.flatMap((child, index) =>
+        resolveBranch(child, model, [...context, {
+          splitPoint: branch.modelPath,
+          index
+        }])
+      )
     } else if (resolved !== undefined) {
       return resolveBranch(resolved, model, context)
-    } else {
-      return undefined
     }
+
+    return undefined
   } else {
     const resolved = branch.resolver()
     if (resolved.type === 'level') {
-      const resolvedChildren = resolved.children.map((val) => prepareBranch(val)).flatMap((val) => resolveBranch(val, model, context)).filter(<T>(val: T | undefined): val is T => val !== undefined)
-
+      const resolvedChildren = resolved.children
+        .flatMap(val => resolveBranch(val, model, context))
+        .filter(<T>(val: T | undefined): val is T => val !== undefined)
       return {
         ...resolved,
         children: resolvedChildren,
         _resolutionContext: context
       }
+    } else {
+      return {
+        ...resolved,
+        _resolutionContext: context
+      }
     }
   }
+}
+
+export function resolveTree (root: PreparedBranch, model: any) {
+  return resolveBranch(root, model, [])
 }
