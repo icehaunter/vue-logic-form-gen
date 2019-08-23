@@ -153,27 +153,19 @@ export function resolveModelPath (
   model: any,
   context: Context
 ) {
-  const copiedContext = [...context]
-  const path = Array.isArray(modelPath) ? [...modelPath] : modelPath.split('.')
+  // const copiedContext = [...context]
+  // const path = Array.isArray(modelPath) ? [...modelPath] : modelPath.split('.')
+
+  const unpreparedPath = Array.isArray(modelPath) ? modelPath.join('.') : modelPath
+
+  const path = context.reduceRight((agg, { index, splitPoint }) => {
+    const replaceable = '(' + splitPoint.replace(/(\$each)/g, '(\\d+|\\$each)').replace('.', '\\.') + '\\.)\\$each'
+    const replacer = RegExp(replaceable)
+    return agg.replace(replacer, '$1' + String(index))
+  }, unpreparedPath).split('.')
 
   return path.reduce((agg, pathPart, currentIndex) => {
-    const pathUntilNow = path.slice(0, currentIndex).join('.')
-
-    let resolvedContextPath: string | number | undefined
-
-    if (copiedContext.length && copiedContext[0].splitPoint === pathUntilNow) {
-      const contextPoint = copiedContext.shift()
-
-      if (pathPart === '$each' && contextPoint !== undefined) {
-        resolvedContextPath = contextPoint.index
-      } else {
-        resolvedContextPath = pathPart
-      }
-    } else {
-      resolvedContextPath = pathPart
-    }
-
-    return agg && agg[resolvedContextPath]
+    return agg && agg[pathPart]
   }, model)
 }
 
