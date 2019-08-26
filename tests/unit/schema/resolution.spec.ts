@@ -29,6 +29,20 @@ describe('resolveModelPath', () => {
     expect(result).toBe(true)
   })
 
+  it('should work for a nested path with array as an argument', () => {
+    const model = {
+      deeply: {
+        nested: {
+          value: true
+        }
+      }
+    }
+
+    const result = resolveModelPath(['deeply', 'nested', 'value'], model, [])
+
+    expect(result).toBe(true)
+  })
+
   it('should work for a path with explicit array index', () => {
     const model = {
       deeply: {
@@ -131,7 +145,7 @@ describe('resolveModelPath', () => {
 })
 
 describe('prepareBranch', () => {
-  it('should build a prepare a simple branch', () => {
+  it('should prepare a simple branch', () => {
     const prepared = prepareBranch({
       type: 'level',
       children: [],
@@ -149,7 +163,23 @@ describe('prepareBranch', () => {
     })
   })
 
-  it('should build a prepare a branch with children', () => {
+  it('should prepare a field', () => {
+    const prepared = prepareBranch({
+      type: 'field',
+      modelPath: ''
+    })
+
+    expect(prepared.type).toBe('simple')
+
+    const resolved = prepared.resolver(undefined)
+
+    expect(resolved).toEqual({
+      type: 'field',
+      modelPath: ''
+    })
+  })
+
+  it('should prepare a branch with children', () => {
     const prepared = prepareBranch({
       type: 'level',
       children: [
@@ -174,7 +204,12 @@ describe('resolveTree', () => {
       children: [
         {
           type: 'level',
-          children: [],
+          children: [
+            {
+              type: 'field',
+              modelPath: ''
+            }
+          ],
           level: 'child'
         }
       ]
@@ -190,7 +225,13 @@ describe('resolveTree', () => {
         {
           _resolutionContext: [],
           type: 'level',
-          children: [],
+          children: [
+            {
+              _resolutionContext: [],
+              type: 'field',
+              modelPath: ''
+            }
+          ],
           level: 'child'
         }
       ]
