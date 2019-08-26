@@ -27,9 +27,6 @@ jobs: # a collection of steps
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
-      - run:
-          name: install-junit
-          command: npm install -D jest-junit
       - run: # run tests
           name: test
           command: npm run test:unit -- --ci --runInBand --reporters=default --reporters=jest-junit --coverage
