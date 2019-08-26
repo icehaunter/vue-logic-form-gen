@@ -158,6 +158,18 @@ export function resolveModelPath (
     ? modelPath.join('.')
     : modelPath
 
+  /**
+  * This is not a very obvious piece of code.
+  * It is here to achieve one thing: replace parts of the path based on the context
+  * even if parts of the actual path contain indexes instead of `$each` blocks.
+  *
+  * This is achieved by taking each split point from the end, and converting it
+  * to a regexp, where each `$each` part is replaced by a (\d+|\$each) regex block
+  * to account for the possible index in place of the `$each`. Moreover, this split point
+  * has to be followed by an `$each` block, which will be replaced by the index - so
+  * this part is appended to the regex as well
+  * 
+  */
   const path = context
     .reduceRight((agg, { index, splitPoint }) => {
       const replaceable =
