@@ -49,12 +49,12 @@ interface PreparedLevel extends Omit<Level, 'children'> {
 /**
  * Branch after preparation.
  * 
- * Has a `resolver` field with a memoized function to actu
+ * Necessarily has a `resolver` field with a memoized function.
  */
 type PreparedBranch = PreparedDependentBranch | PreparedSimpleBranch
 
 /**
- * Extention interface to add a resolution context to anything
+ * Extension interface to add a resolution context to anything
  */
 interface Contextualized {
   /**
@@ -86,7 +86,7 @@ interface ResolvedField extends Field, Contextualized {}
  * 
  * Essentially, this function converts the schema into a tree of functions,
  * where each function represents a branching of some kind and is memoized.
- * This allows for a quick resolultion with no recalculation of the
+ * This allows for a quick resolution with no recalculation of the
  * entire tree on each model change.
  * 
  * @param branch branch to be a root of preparation
@@ -111,9 +111,9 @@ export function prepareBranch (branch: LogicalBranch): PreparedBranch {
 /**
  * Prepare an if branch for resolution.
  * 
- * Prepared funciton is memoized as to avoid recalculation of this part of the schema
+ * Prepared function is memoized as to avoid recalculation of this part of the schema
  * if the model didn't change.
- * @param branch if-branch for prepataion
+ * @param branch if-branch for preparation
  */
 function prepareIfBranch (branch: If): PreparedBranch {
   const thenBranch = prepareBranch(branch.then)
@@ -132,9 +132,9 @@ function prepareIfBranch (branch: If): PreparedBranch {
 /**
  * Prepare an elif branch for resolution.
  * 
- * Prepared funciton is memoized as to avoid recalculation of this part of the schema
+ * Prepared function is memoized as to avoid recalculation of this part of the schema
  * if the model didn't change.
- * @param branch elif-branch for prepataion
+ * @param branch elif-branch for preparation
  */
 function prepareElifBranch (branch: Elif): PreparedBranch {
   const thenBranches = branch.elifs.map(({ predicate, then }) => ({
@@ -161,9 +161,9 @@ function prepareElifBranch (branch: Elif): PreparedBranch {
 /**
  * Prepare a switch branch for resolution.
  * 
- * Prepared funciton is memoized as to avoid recalculation of this part of the schema
+ * Prepared function is memoized as to avoid recalculation of this part of the schema
  * if the model didn't change.
- * @param branch switch-branch for prepataion
+ * @param branch switch-branch for preparation
  */
 function prepareSwitchBranch (branch: Switch): PreparedBranch {
   const cases = Object.keys(branch.cases).reduce(
@@ -195,9 +195,9 @@ function prepareSwitchBranch (branch: Switch): PreparedBranch {
 /**
  * Prepare a for branch for resolution.
  * 
- * Prepared funciton is memoized as to avoid recalculation of this part of the schema
+ * Prepared function is memoized as to avoid recalculation of this part of the schema
  * if the model didn't change.
- * @param branch for-branch for prepataion
+ * @param branch for-branch for preparation
  */
 function prepareForBranch (branch: For): PreparedBranch {
   const branchTemplate = prepareBranch(branch.schema)
@@ -218,9 +218,9 @@ function prepareForBranch (branch: For): PreparedBranch {
 }
 
 /**
- * Prepare a level for resultion. Level resultion itself is not dependent on the model,
+ * Prepare a level for resolution. Level resolution itself is not dependent on the model,
  * but all the children must be prepared.
- * @param level level for preparaion
+ * @param level level for preparation
  */
 function prepareLevelBranch (level: Level): PreparedBranch {
   return {
@@ -246,7 +246,7 @@ function prepareField (field: Field): PreparedBranch {
 /**
  * Return a value from the model based on the given dot-separated path.
  * 
- * `$each` parts are replaced with the appropiate index based on the context.
+ * `$each` parts are replaced with the appropriate index based on the context.
  * 
  * @param modelPath Dot-separated path within the model.
  * Array indexing is also dot-based, so `array.3` means `array[3]`.
@@ -306,10 +306,10 @@ type ResolutionOptions = ResolvedField | ResolvedLevel | undefined
 /**
  * Resolve branch and all its children, returning a tree with no variants within it.
  * 
- * This is a ecursive function, which resolves any model-dependent branching within the schema tree
+ * This is a recursive function, which resolves any model-dependent branching within the schema tree
  * and leaves only produced levels and fields in the resulting tree.
  * 
- * Actual resultion is easy to do after the preparation - we only need to call the appropriate
+ * Actual resolution is easy to do after the preparation - we only need to call the appropriate
  * function and modify the context if need be. Again, the resolution is quick if only one part
  * of the model changes because each branching path is memoized separately.
  * 
@@ -364,7 +364,7 @@ function resolveBranch (
 /**
  * Resolve the prepared tree against the actual model.
  * 
- * This function retuns a tree, which has no dependencies or variations - every branching
+ * This function returns a tree, which has no dependencies or variations - every branching
  * option has been resolved at this point, so we can traverse this tree with certainty that
  * only `levels` and `fields` are present.
  * 

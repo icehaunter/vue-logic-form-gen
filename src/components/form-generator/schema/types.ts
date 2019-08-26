@@ -14,13 +14,13 @@
  * Field rendering is defined by the widget property. Any validations for the specified model
  * are also defined here. If multiple fields in the schema point to the same `modelPath`, their
  * validations are collected and merged together, although it is recommended to define all validations
- * on one field in such case - for maintainablity.
+ * on one field in such case - for maintainability.
  *
  * Logical blocks are the most interesting part of the schema - they allow for creation of complex and
  * dynamic layouts. They come in four types: `If`, `Elif`, `Switch` and `For`. First three allow branching
  * or conditional rendering of parts of the schema tree, while `For` gives an ability to render fields
  * for each item of an array of values. All logical blocks are dependent on one field by default. This
- * is by design, as it allows to keep parts of the schema from recalulation.
+ * is by design, as it allows to keep parts of the schema from recalculation.
  * @module
  */
 

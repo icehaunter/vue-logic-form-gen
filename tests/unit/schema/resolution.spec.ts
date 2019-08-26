@@ -588,7 +588,7 @@ describe('resolveTree', () => {
   })
 
   describe('complex cases', () => {
-    it('should filter out children resolved ot undefined', () => {
+    it('should filter out children resolved to undefined', () => {
       const prepared = prepareBranch({
         type: 'level',
         level: 'parent',
