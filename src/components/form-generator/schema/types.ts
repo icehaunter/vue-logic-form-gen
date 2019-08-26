@@ -43,7 +43,10 @@ export interface Level extends TypedBlock {
   /**
    * Can be anything. Is passed to the header and footer slot at rendering.
    */
-  context: any
+  context?: any
+  /**
+   * Children of the level.
+   */
   children: LogicalBranch[]
 }
 

@@ -23,3 +23,5 @@ yarn-error.log*
 # Artifacts
 /coverage
 /reports
+/.stryker-tmp
+/junit.xml

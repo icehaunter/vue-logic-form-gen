@@ -1,9 +1,12 @@
-version: 2 # use CircleCI 2.0
+version: 2.1 # use CircleCI 2.0
 workflows:
   version: 2
   test:
     jobs:
       - test
+
+orbs:
+  codecov: codecov/codecov@1
 
 jobs: # a collection of steps
   test: # runs not using Workflows must have a `build` job as entry point
@@ -24,18 +27,18 @@ jobs: # a collection of steps
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
-      - run:
-          name: install-junit
-          command: npm install -D jest-junit
       - run: # run tests
           name: test
           command: npm run test:unit -- --ci --runInBand --reporters=default --reporters=jest-junit --coverage
           environment:
-            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
-      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
+            JEST_JUNIT_OUTPUT: 'reports/junit/js-test-results.xml'
+      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
           path: coverage
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: "reports/junit"
+          path: 'reports/junit'
+      - codecov/upload:
+          file: 'coverage/coverage-final.json'
+
   test-mutate: # runs not using Workflows must have a `build` job as entry point
     docker: # run the steps with Docker
       - image: circleci/node:12.8 # ...with this image as the primary container; this is where all `steps` will run
@@ -54,13 +57,10 @@ jobs: # a collection of steps
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
-      - run:
-          name: install-junit
-          command: npm install -D jest-junit
       - run: # run tests
           name: test
-          command: npm run test:unit -- --ci --runInBand --reporters=default --reporters=jest-junit --coverage
+          command: npm run test:stryker -- --ci --runInBand
           environment:
-            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
-      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: "reposts/mutation"
+            JEST_JUNIT_OUTPUT: 'reports/junit/js-test-results.xml'
+      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+          path: 'reposts/mutation'
