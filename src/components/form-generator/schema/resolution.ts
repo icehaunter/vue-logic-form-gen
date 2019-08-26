@@ -1,8 +1,9 @@
 import { LogicalBranch, Level, If, Elif, Switch, For, Field } from './types'
-import { memoize } from 'lodash'
+import { isEqual } from 'lodash'
+import memoize from 'memoize-one'
 
 type Context = Array<{
-  splitPoint: string,
+  splitPoint: string
   index: number
 }>
 
@@ -60,7 +61,7 @@ function prepareIfBranch (branch: If): PreparedBranch {
     resolver: memoize((value: any) => {
       if (branch.predicate(value)) return thenBranch
       else return elseBranch
-    })
+    }, isEqual)
   }
 }
 
@@ -77,7 +78,7 @@ function prepareElifBranch (branch: Elif): PreparedBranch {
     }
 
     return elseBranch
-  })
+  }, isEqual)
 
   return {
     type: 'dependent',
@@ -104,7 +105,7 @@ function prepareSwitchBranch (branch: Switch): PreparedBranch {
     } else {
       return fallback
     }
-  })
+  }, isEqual)
 
   return {
     type: 'dependent',
@@ -122,7 +123,7 @@ function prepareForBranch (branch: For): PreparedBranch {
     }
 
     return undefined
-  })
+  }, isEqual)
 
   return {
     type: 'dependent',
@@ -153,16 +154,20 @@ export function resolveModelPath (
   model: any,
   context: Context
 ) {
-  // const copiedContext = [...context]
-  // const path = Array.isArray(modelPath) ? [...modelPath] : modelPath.split('.')
+  const unpreparedPath = Array.isArray(modelPath)
+    ? modelPath.join('.')
+    : modelPath
 
-  const unpreparedPath = Array.isArray(modelPath) ? modelPath.join('.') : modelPath
-
-  const path = context.reduceRight((agg, { index, splitPoint }) => {
-    const replaceable = '(' + splitPoint.replace(/(\$each)/g, '(\\d+|\\$each)').replace('.', '\\.') + '\\.)\\$each'
-    const replacer = RegExp(replaceable)
-    return agg.replace(replacer, '$1' + String(index))
-  }, unpreparedPath).split('.')
+  const path = context
+    .reduceRight((agg, { index, splitPoint }) => {
+      const replaceable =
+        '(' +
+        splitPoint.replace(/(\$each)/g, '(\\d+|\\$each)').replace('.', '\\.') +
+        '\\.)\\$each'
+      const replacer = RegExp(replaceable)
+      return agg.replace(replacer, '$1' + String(index))
+    }, unpreparedPath)
+    .split('.')
 
   return path.reduce((agg, pathPart, currentIndex) => {
     return agg && agg[pathPart]
@@ -182,10 +187,13 @@ function resolveBranch (
 
     if (Array.isArray(resolved)) {
       return resolved.flatMap((child, index) =>
-        resolveBranch(child, model, [...context, {
-          splitPoint: branch.modelPath,
-          index
-        }])
+        resolveBranch(child, model, [
+          ...context,
+          {
+            splitPoint: branch.modelPath,
+            index
+          }
+        ])
       )
     } else if (resolved !== undefined) {
       return resolveBranch(resolved, model, context)
