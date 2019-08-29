@@ -9,7 +9,7 @@ module.exports = function (config) {
     jest: {
       config: require('./jest.config')
     },
-    reporters: ['progress', 'clear-text', 'html'],
+    reporters: ['progress', 'clear-text', 'html', 'dashboard'],
     coverageAnalysis: 'off'
   })
 }
