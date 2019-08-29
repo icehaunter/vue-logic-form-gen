@@ -1,5 +1,6 @@
 [![CircleCI](https://circleci.com/gh/icehaunter/vue-logic-form-gen.svg?style=svg)](https://circleci.com/gh/icehaunter/vue-logic-form-gen)
 [![codecov](https://codecov.io/gh/icehaunter/vue-logic-form-gen/branch/master/graph/badge.svg)](https://codecov.io/gh/icehaunter/vue-logic-form-gen)
+[![Mutation testing badge](https://badge.stryker-mutator.io/github.com/icehaunter/vue-logic-form-gen/master)](https://stryker-mutator.github.io)
 
 # Vue Logic Form Generator
 ## A schema-based form generator for Vue, but with resolution logic
