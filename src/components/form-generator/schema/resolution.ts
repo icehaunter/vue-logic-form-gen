@@ -257,11 +257,11 @@ function prepareField (field: Field): PreparedBranch {
  * 
  * @param context Context for `$each` parts resolution
  */
-export function resolveModelPath (
+export function resolveModelPath<T = any> (
   modelPath: string | string[],
   model: any,
   context: Context
-) {
+): T | undefined {
   const unpreparedPath = Array.isArray(modelPath)
     ? modelPath.join('.')
     : modelPath
