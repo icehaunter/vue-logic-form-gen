@@ -2,6 +2,7 @@ import {
   ModifierChain,
   resolveModifierChain
 } from '@/components/form-generator/logic/modifiers'
+import { ModifierValueUndefinedError } from '@/components/form-generator/logic/errors'
 
 describe('Modifier chain resolution', () => {
   it('should resolve a basic modifier chain from one link', () => {
@@ -44,5 +45,13 @@ describe('Modifier chain resolution', () => {
       ['number', 'double', [], 'number']
     ]
     expect(() => resolveModifierChain('10 symbols', chain, {}, [])).toThrowError(TypeError)
+  })
+
+  it('should end early with the undefined value if one of the steps is undefined', () => {
+    const chain: ModifierChain<'object'> = [
+      ['object', 'get', ['key'], 'number'],
+      ['number', 'double', [], 'number']
+    ]
+    expect(() => resolveModifierChain({}, chain, {}, [])).toThrowError(ModifierValueUndefinedError)
   })
 })

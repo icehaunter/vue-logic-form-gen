@@ -1,5 +1,8 @@
-import { resolveValue } from '@/components/form-generator/logic'
+import {
+  resolveValue
+} from '@/components/form-generator/logic'
 import { Value } from '@/components/form-generator/logic/value'
+import { ModelValueUndefinedError, ModifierValueUndefinedError } from '@/components/form-generator/logic/errors'
 
 describe('Value unwrapping', () => {
   describe('Basic types', () => {
@@ -48,7 +51,7 @@ describe('Value unwrapping', () => {
     })
 
     it('Should properly unwrap an object', () => {
-      const source: Value<{ _buildFrom: string, a: string }> = {
+      const source: Value<{ _buildFrom: string; a: string }> = {
         _buildFrom: 'block',
         a: '1'
       }
@@ -72,7 +75,11 @@ describe('Value unwrapping', () => {
       const source: Value<string[]> = {
         _modelPath: 'value'
       }
-      const result = resolveValue(source as Value<string[]>, { value: ['a'] }, [])
+      const result = resolveValue(
+        source as Value<string[]>,
+        { value: ['a'] },
+        []
+      )
 
       expect(result).toEqual(['a'])
     })
@@ -81,9 +88,56 @@ describe('Value unwrapping', () => {
       const source: Value<string[]> = {
         _modelPath: 'value'
       }
-      const result = resolveValue(source as Value<string[]>, { value: { a: 1 } }, [])
+      const result = resolveValue(
+        source as Value<string[]>,
+        { value: { a: 1 } },
+        []
+      )
 
       expect(result).toEqual({ a: 1 })
+    })
+
+    it('Should throw an error if resolved value is undefined', () => {
+      expect(() =>
+        resolveValue({ _modelPath: 'value' } as Value<string[]>, {}, [])
+      ).toThrowError(ModelValueUndefinedError)
+    })
+  })
+
+  describe('Value building', () => {
+    it('Should build from a basic value, applying the modifiers', () => {
+      const source: Value<number> = {
+        _buildFrom: 'test',
+        _actions: [['string', 'length', [], 'number']]
+      }
+
+      const result = resolveValue(source, {}, [])
+
+      expect(result).toBe(4)
+    })
+
+    it('Should build from a model-sourced value, applying the modifiers', () => {
+      const source: Value<number> = {
+        _buildFrom: {
+          _modelPath: 'value'
+        },
+        _actions: [['string', 'length', [], 'number']]
+      }
+
+      const result = resolveValue(source, { value: 'test' }, [])
+
+      expect(result).toBe(4)
+    })
+
+    it('Should fail if modifiers return undefined at any point', () => {
+      const source: Value<number> = {
+        _buildFrom: {
+          _modelPath: 'value'
+        },
+        _actions: [['object', 'get', ['any'], 'number']]
+      }
+
+      expect(() => resolveValue(source, { value: { from: 'to' } }, [])).toThrowError(ModifierValueUndefinedError)
     })
   })
 })
