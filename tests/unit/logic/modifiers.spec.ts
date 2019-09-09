@@ -25,6 +25,19 @@ describe('Modifier chain resolution', () => {
     expect(result).toBe(20)
   })
 
+  it('should work with multiple type conversions along the line', () => {
+    const chain: ModifierChain<'object'> = [
+      ['object', 'get', ['key'], 'string'],
+      ['string', 'length', [], 'number'],
+      ['number', 'add', [5], 'number'],
+      ['number', 'toString', [], 'string']
+    ]
+
+    const result = resolveModifierChain({ key: 'four' }, chain, {}, []) as string
+
+    expect(result).toBe('9')
+  })
+
   it('should resolve throw an error if modifier chain is invalid', () => {
     const chain: ModifierChain<'string'> = [
       ['string', 'join', ['10 symbols'], 'string'],
