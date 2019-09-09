@@ -2,7 +2,7 @@ import { resolveModelPath, Context } from '../schema/resolution'
 import { Value, isValueFromModel, isValueBuilder } from './value'
 import { resolveModifierChain } from './modifiers'
 
-class ValueUndefinedError extends Error {
+export class ValueUndefinedError extends Error {
   path: string
   context: Context
 
