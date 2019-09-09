@@ -7,5 +7,5 @@ export type StringModifierTypes = {
 export const modifiers: StringModifierTypes = {
   join: (left, right) => left + right,
   length: (target) => target.length,
-  testRegex: (target, regex) => regex instanceof RegExp ? regex.test(target) : (new RegExp(regex)).test(regex)
+  testRegex: (target, regex) => regex instanceof RegExp ? regex.test(target) : (new RegExp(regex)).test(target)
 }
