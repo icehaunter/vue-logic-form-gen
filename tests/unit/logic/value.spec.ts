@@ -46,6 +46,16 @@ describe('Value unwrapping', () => {
 
       expect(result).toEqual({ a: '1' })
     })
+
+    it('Should properly unwrap an object', () => {
+      const source: Value<{ _buildFrom: string, a: string }> = {
+        _buildFrom: 'block',
+        a: '1'
+      }
+      const result = resolveValue(source, {}, [])
+
+      expect(result).toEqual({ _buildFrom: 'block', a: '1' })
+    })
   })
 
   describe('Model path usage', () => {
