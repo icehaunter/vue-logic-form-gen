@@ -9,6 +9,7 @@ import { ObjectModifierTypes, modifiers as objectModifiers } from './type/object
 import { Context } from '../../schema/resolution'
 import { resolveValue } from '..'
 import { Value, UnwrapValueArray } from '../value'
+import { ModifierValueUndefinedError } from '../errors'
 
 type BooleanModifiers = BuildModifiers<BooleanModifierTypes>
 type StringModifiers = BuildModifiers<StringModifierTypes>
@@ -45,15 +46,19 @@ function convertValues<K extends Array<any>> (values: K, model: any, context: Co
 
 const modifierReduce = (model: any, context: Context) => <T extends Modifier> (
   { value, type }: { value: ConvertBasicToAny<T[0]>, type: BasicType | undefined },
-  [ newType, command, args, nextType ]: T,
+  [ fromType, command, args, nextType ]: T,
   index: number
 ) => {
-  if (type !== undefined && type !== newType) {
-    throw new TypeError(`Modifier chain is invalid: expected command for type "${type}", recieved for type "${newType}" at action #${index}`)
+  if (type !== undefined && type !== fromType) {
+    throw new TypeError(`Modifier chain is invalid: expected command for type "${type}", recieved for type "${fromType}" at action #${index}`)
   }
 
   const resolvedArgs = convertValues(args, model, context)
-  const newValue = (modifiers[newType] as any)[command](value, ...resolvedArgs)
+  const newValue = (modifiers[fromType] as any)[command](value, ...resolvedArgs)
+
+  if (newValue === undefined) {
+    throw new ModifierValueUndefinedError(fromType, command, value, resolvedArgs, nextType)
+  }
 
   return {
     value: newValue,

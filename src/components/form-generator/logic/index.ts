@@ -1,17 +1,7 @@
 import { resolveModelPath, Context } from '../schema/resolution'
 import { Value, isValueFromModel, isValueBuilder } from './value'
 import { resolveModifierChain } from './modifiers'
-
-export class ValueUndefinedError extends Error {
-  path: string
-  context: Context
-
-  constructor (path: string, context: Context) {
-    super(`Value resolution failed: property is undefined; path: ${path}`)
-    this.path = path
-    this.context = context
-  }
-}
+import { ModelValueUndefinedError } from './errors'
 
 export function resolveValue<T> (value: Value<T>, model: any, context: Context): T {
   if (typeof value !== 'object' || value === null) {
@@ -21,7 +11,7 @@ export function resolveValue<T> (value: Value<T>, model: any, context: Context):
     if (result !== undefined) {
       return result
     } else {
-      throw new ValueUndefinedError(value._modelPath, context)
+      throw new ModelValueUndefinedError(value._modelPath, context)
     }
   } else if (isValueBuilder(value)) {
     const initialValue = resolveValue(value._buildFrom, model, context)
