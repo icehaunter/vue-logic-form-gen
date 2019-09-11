@@ -14,8 +14,7 @@
   "dependencies": {
     "core-js": "^2.6.5",
     "date-fns": "^2.0.1",
-    "lodash": "^4.17.15",
-    "memoize-one": "^5.1.1",
+    "memoize-state": "^2.0.10",
     "vue": "^2.6.10"
   },
   "devDependencies": {
