@@ -1,8 +1,15 @@
-import { LogicalBranch, If, Elif, Switch, For, Level, Field } from '../schema/types'
+import {
+  LogicalBranch,
+  If,
+  Elif,
+  Switch,
+  For,
+  Level,
+  Field
+} from '../schema/types'
 import { Prepared, Context } from './types'
-import memoize from 'memoize-one'
+import memoize from 'memoize-state'
 import { resolveValue } from '../logic'
-import { isEqual } from 'lodash'
 
 type PreparedBranch = Prepared.Any
 
@@ -47,10 +54,12 @@ function prepareIfBranch (branch: If): PreparedBranch {
   return {
     _tag: 'branch',
     resolver: memoize((model: any, context: Context) => {
-      const value = resolveValue(branch.predicate, model, context, { returnUndefined: true })
+      const value = resolveValue(branch.predicate, model, context, {
+        returnUndefined: true
+      })
       if (value) return thenBranch
       else return elseBranch
-    }, isEqual)
+    })
   }
 }
 
@@ -76,7 +85,7 @@ function prepareElifBranch (branch: Elif): PreparedBranch {
     }
 
     return elseBranch
-  }, isEqual)
+  })
 
   return {
     _tag: 'branch',
@@ -113,7 +122,7 @@ function prepareSwitchBranch (branch: Switch): PreparedBranch {
     } else {
       return fallback
     }
-  }, isEqual)
+  })
 
   return {
     _tag: 'branch',
@@ -144,7 +153,7 @@ function prepareForBranch (branch: For): PreparedBranch {
     }
 
     return undefined
-  }, isEqual)
+  })
 
   return {
     _tag: 'array',
@@ -161,13 +170,10 @@ function prepareForBranch (branch: For): PreparedBranch {
 function prepareLevelBranch (level: Level): PreparedBranch {
   return {
     _tag: 'level',
-    resolver: memoize(
-      () => ({
-        ...level,
-        children: level.children.map(v => prepareBranch(v))
-      }),
-      isEqual
-    )
+    resolver: memoize(() => ({
+      ...level,
+      children: level.children.map(v => prepareBranch(v))
+    }))
   }
 }
 
