@@ -1,3 +1,6 @@
+import { ModifierChain } from '../logic/modifiers'
+import { Value } from '../logic/value'
+
 /**
  * This module contains the types for the building blocks of the
  * schema for the form tree.
@@ -94,13 +97,13 @@ export type Branch = Level | Field
  * If `else` branch is not present and the predicate evaluated to `false`,
  * nothing is rendered in the tree.
  */
-export interface If extends ModelDependent {
+export interface If {
   type: 'if'
   /**
    * Predicate based on the value from `modelPath`.
    * Will be reevaluated only on change of the underlying model value
    */
-  predicate: any
+  predicate: Value<boolean>
   /**
    * Branch to follow if the predicate is true
    */
@@ -121,13 +124,13 @@ export interface If extends ModelDependent {
  * If `else` branch is not present and all predicates evaluated to `false`,
  * nothing is rendered in the tree.
  */
-export interface Elif extends ModelDependent {
+export interface Elif {
   type: 'elif'
   /**
    * Array of predicates and corresponding branches
    */
   elifs: Array<{
-    predicate: any
+    predicate: Value<boolean>
     then: LogicalBranch
   }>
   /**
@@ -147,8 +150,11 @@ export interface Elif extends ModelDependent {
  * If no default branch is provided, and nothing matched the value within the `cases` object,
  * nothing is rendered.
  */
-export interface Switch extends ModelDependent {
+export interface Switch {
   type: 'switch'
+
+  value: Value<string>
+
   /**
    * Cases from which to choose a branch based on the value from the model
    */

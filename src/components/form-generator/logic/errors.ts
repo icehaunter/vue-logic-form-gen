@@ -1,4 +1,4 @@
-import { Context, resolveContextPath } from '../schema/resolution'
+import { Context, resolveContextPath } from '../resolution'
 import { BasicType } from './types'
 
 export class ValueUndefinedError extends Error {
