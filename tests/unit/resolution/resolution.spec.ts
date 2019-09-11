@@ -1,200 +1,7 @@
 import {
   prepareBranch,
-  resolveTree,
-  resolveModelPath
-} from '@/components/form-generator/schema/resolution'
-
-describe('resolveModelPath', () => {
-  it('should return a basic value based on the path', () => {
-    const model = {
-      value: true
-    }
-
-    const result = resolveModelPath('value', model, [])
-
-    expect(result).toBe(true)
-  })
-
-  it('should work for a nested path', () => {
-    const model = {
-      deeply: {
-        nested: {
-          value: true
-        }
-      }
-    }
-
-    const result = resolveModelPath('deeply.nested.value', model, [])
-
-    expect(result).toBe(true)
-  })
-
-  it('should work for a nested path with array as an argument', () => {
-    const model = {
-      deeply: {
-        nested: {
-          value: true
-        }
-      }
-    }
-
-    const result = resolveModelPath(['deeply', 'nested', 'value'], model, [])
-
-    expect(result).toBe(true)
-  })
-
-  it('should work for a path with explicit array index', () => {
-    const model = {
-      deeply: {
-        nested: [
-          {
-            value: true
-          }
-        ]
-      }
-    }
-
-    const result = resolveModelPath('deeply.nested.0.value', model, [])
-
-    expect(result).toBe(true)
-  })
-
-  it('should work with an "$each" keyword and proper context', () => {
-    const model = {
-      deeply: {
-        nested: [
-          {
-            value: true
-          }
-        ]
-      }
-    }
-
-    const result = resolveModelPath('deeply.nested.$each.value', model, [{
-      index: 0,
-      splitPoint: 'deeply.nested'
-    }])
-
-    expect(result).toBe(true)
-  })
-
-  it('should work with an "$each" keyword and proper context with multiple arrays', () => {
-    const model = {
-      deeply: {
-        nested: [
-          {
-            array: [
-              {
-                value: true
-              }
-            ]
-          }
-        ]
-      }
-    }
-
-    const result = resolveModelPath('deeply.nested.$each.array.$each.value', model, [
-      {
-        index: 0,
-        splitPoint: 'deeply.nested'
-      },
-      {
-        index: 0,
-        splitPoint: 'deeply.nested.$each.array'
-      }
-    ])
-
-    expect(result).toBe(true)
-  })
-
-  it('should work with an "$each" keyword and use proper context if one $each is hardcoded', () => {
-    const model = {
-      deeply: {
-        nested: [
-          {
-            array: [
-              {
-                value: false
-              }
-            ]
-          },
-          {
-            array: [
-              {
-                value: true
-              }
-            ]
-          }
-        ]
-      }
-    }
-
-    const result = resolveModelPath('deeply.nested.1.array.$each.value', model, [
-      {
-        index: 0,
-        splitPoint: 'deeply.nested'
-      },
-      {
-        index: 0,
-        splitPoint: 'deeply.nested.$each.array'
-      }
-    ])
-
-    expect(result).toBe(true)
-  })
-})
-
-describe('prepareBranch', () => {
-  it('should prepare a simple branch', () => {
-    const prepared = prepareBranch({
-      type: 'level',
-      children: [],
-      level: 'test'
-    })
-
-    expect(prepared.type).toBe('simple')
-
-    const resolved = prepared.resolver(undefined)
-
-    expect(resolved).toEqual({
-      type: 'level',
-      children: [],
-      level: 'test'
-    })
-  })
-
-  it('should prepare a field', () => {
-    const prepared = prepareBranch({
-      type: 'field',
-      modelPath: ''
-    })
-
-    expect(prepared.type).toBe('simple')
-
-    const resolved = prepared.resolver(undefined)
-
-    expect(resolved).toEqual({
-      type: 'field',
-      modelPath: ''
-    })
-  })
-
-  it('should prepare a branch with children', () => {
-    const prepared = prepareBranch({
-      type: 'level',
-      children: [
-        {
-          type: 'level',
-          children: [],
-          level: 'child'
-        }
-      ],
-      level: 'test'
-    })
-
-    expect(prepared.type).toBe('simple')
-  })
-})
+  resolveTree
+} from '@/components/form-generator/resolution'
 
 describe('resolveTree', () => {
   it('should build a real tree based on the simple prepared one', () => {
@@ -242,8 +49,9 @@ describe('resolveTree', () => {
     it('should resolve "then" branch if value is true', () => {
       const prepared = prepareBranch({
         type: 'if',
-        modelPath: 'value',
-        predicate: (k: boolean) => k,
+        predicate: {
+          _modelPath: 'value'
+        },
         then: {
           type: 'level',
           children: [],
@@ -264,8 +72,9 @@ describe('resolveTree', () => {
     it('should resolve to `undefined` if value is false and else branch is missing', () => {
       const prepared = prepareBranch({
         type: 'if',
-        modelPath: 'value',
-        predicate: (k: boolean) => k,
+        predicate: {
+          _modelPath: 'value'
+        },
         then: {
           type: 'level',
           children: [],
@@ -281,8 +90,9 @@ describe('resolveTree', () => {
     it('should resolve to else branch if value is false', () => {
       const prepared = prepareBranch({
         type: 'if',
-        modelPath: 'value',
-        predicate: (k: boolean) => k,
+        predicate: {
+          _modelPath: 'value'
+        },
         then: {
           type: 'level',
           children: [],
@@ -304,16 +114,47 @@ describe('resolveTree', () => {
         level: 'false'
       })
     })
+
+    it('should resolve to else branch if value is missing altogether', () => {
+      const prepared = prepareBranch({
+        type: 'if',
+        predicate: {
+          _modelPath: 'value'
+        },
+        then: {
+          type: 'level',
+          children: [],
+          level: 'true'
+        },
+        else: {
+          type: 'level',
+          children: [],
+          level: 'false'
+        }
+      })
+
+      const resolved = resolveTree(prepared, {})
+      expect(resolved).toEqual({
+        _resolutionContext: [],
+        type: 'level',
+        children: [],
+        level: 'false'
+      })
+    })
   })
 
   describe('tree building with elif branching', () => {
     it('should should resolve to a truthful predicate', () => {
       const prepared = prepareBranch({
         type: 'elif',
-        modelPath: 'value',
         elifs: [
           {
-            predicate: (x: boolean) => !x,
+            predicate: {
+              _buildFrom: {
+                _modelPath: 'value'
+              },
+              _actions: [['boolean', 'not', [], 'boolean']]
+            },
             then: {
               type: 'level',
               level: 'First child',
@@ -321,7 +162,9 @@ describe('resolveTree', () => {
             }
           },
           {
-            predicate: (x: boolean) => x,
+            predicate: {
+              _modelPath: 'value'
+            },
             then: {
               type: 'level',
               level: 'Second child',
@@ -344,10 +187,11 @@ describe('resolveTree', () => {
     it('should should resolve to a first truthful predicate', () => {
       const prepared = prepareBranch({
         type: 'elif',
-        modelPath: 'value',
         elifs: [
           {
-            predicate: (x: boolean) => x,
+            predicate: {
+              _modelPath: 'value'
+            },
             then: {
               type: 'level',
               level: 'First child',
@@ -355,7 +199,9 @@ describe('resolveTree', () => {
             }
           },
           {
-            predicate: (x: boolean) => x,
+            predicate: {
+              _modelPath: 'value'
+            },
             then: {
               type: 'level',
               level: 'Second child',
@@ -378,10 +224,11 @@ describe('resolveTree', () => {
     it('should should resolve to `undefined` if else is not present and nothing matched', () => {
       const prepared = prepareBranch({
         type: 'elif',
-        modelPath: 'value',
         elifs: [
           {
-            predicate: (x: boolean) => !x,
+            predicate: {
+              _modelPath: 'value'
+            },
             then: {
               type: 'level',
               level: 'First child',
@@ -389,7 +236,9 @@ describe('resolveTree', () => {
             }
           },
           {
-            predicate: (x: boolean) => !x,
+            predicate: {
+              _modelPath: 'value'
+            },
             then: {
               type: 'level',
               level: 'Second child',
@@ -399,18 +248,19 @@ describe('resolveTree', () => {
         ]
       })
 
-      const resolved = resolveTree(prepared, { value: true })
+      const resolved = resolveTree(prepared, { value: false })
 
       expect(resolved).toBeUndefined()
     })
 
-    it('should should resolve to an else branch if all else fails', () => {
+    it('should should resolve to `undefined` if else is not present and path is not available', () => {
       const prepared = prepareBranch({
         type: 'elif',
-        modelPath: 'value',
         elifs: [
           {
-            predicate: (x: boolean) => false,
+            predicate: {
+              _modelPath: 'value'
+            },
             then: {
               type: 'level',
               level: 'First child',
@@ -418,7 +268,37 @@ describe('resolveTree', () => {
             }
           },
           {
-            predicate: (x: boolean) => false,
+            predicate: {
+              _modelPath: 'value'
+            },
+            then: {
+              type: 'level',
+              level: 'Second child',
+              children: []
+            }
+          }
+        ]
+      })
+
+      const resolved = resolveTree(prepared, { })
+
+      expect(resolved).toBeUndefined()
+    })
+
+    it('should should resolve to an else branch if all else fails', () => {
+      const prepared = prepareBranch({
+        type: 'elif',
+        elifs: [
+          {
+            predicate: false,
+            then: {
+              type: 'level',
+              level: 'First child',
+              children: []
+            }
+          },
+          {
+            predicate: false,
             then: {
               type: 'level',
               level: 'Second child',
@@ -448,7 +328,9 @@ describe('resolveTree', () => {
     it('should properly present the branch based on the model value', () => {
       const prepared = prepareBranch({
         type: 'switch',
-        modelPath: 'value',
+        value: {
+          _modelPath: 'value'
+        },
         cases: {
           first: {
             type: 'level',
@@ -476,7 +358,9 @@ describe('resolveTree', () => {
     it('should resolve to `undefined` if value is not present in cases', () => {
       const prepared = prepareBranch({
         type: 'switch',
-        modelPath: 'value',
+        value: {
+          _modelPath: 'value'
+        },
         cases: {
           first: {
             type: 'level',
@@ -496,10 +380,37 @@ describe('resolveTree', () => {
       expect(resolved).toBeUndefined()
     })
 
+    it('should resolve to `undefined` if value is not present on the model', () => {
+      const prepared = prepareBranch({
+        type: 'switch',
+        value: {
+          _modelPath: 'value'
+        },
+        cases: {
+          first: {
+            type: 'level',
+            level: 'first',
+            children: []
+          },
+          second: {
+            type: 'level',
+            level: 'second',
+            children: []
+          }
+        }
+      })
+
+      const resolved = resolveTree(prepared, { })
+
+      expect(resolved).toBeUndefined()
+    })
+
     it('should resolve to default branch if value is not present in cases and default is given', () => {
       const prepared = prepareBranch({
         type: 'switch',
-        modelPath: 'value',
+        value: {
+          _modelPath: 'value'
+        },
         cases: {
           first: {
             type: 'level',
@@ -548,19 +459,23 @@ describe('resolveTree', () => {
 
       expect(resolved).toEqual([
         {
-          _resolutionContext: [{
-            index: 0,
-            splitPoint: 'value'
-          }],
+          _resolutionContext: [
+            {
+              index: 0,
+              splitPoint: 'value'
+            }
+          ],
           type: 'level',
           level: 'forChild',
           children: []
         },
         {
-          _resolutionContext: [{
-            index: 1,
-            splitPoint: 'value'
-          }],
+          _resolutionContext: [
+            {
+              index: 1,
+              splitPoint: 'value'
+            }
+          ],
           type: 'level',
           level: 'forChild',
           children: []
@@ -585,6 +500,22 @@ describe('resolveTree', () => {
 
       expect(resolved).toBeUndefined()
     })
+
+    it('should resolve to `undefined` if value is not present on the model', () => {
+      const prepared = prepareBranch({
+        type: 'for',
+        modelPath: 'value',
+        schema: {
+          type: 'level',
+          level: 'forChild',
+          children: []
+        }
+      })
+
+      const resolved = resolveTree(prepared, {})
+
+      expect(resolved).toBeUndefined()
+    })
   })
 
   describe('complex cases', () => {
@@ -595,8 +526,9 @@ describe('resolveTree', () => {
         children: [
           {
             type: 'if',
-            modelPath: 'value',
-            predicate: (x: boolean) => x,
+            predicate: {
+              _modelPath: 'value'
+            },
             then: {
               type: 'level',
               level: 'child',
