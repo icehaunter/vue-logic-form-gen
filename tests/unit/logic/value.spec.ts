@@ -50,7 +50,7 @@ describe('Value unwrapping', () => {
       expect(result).toEqual({ a: '1' })
     })
 
-    it('Should properly unwrap an object', () => {
+    it('Should properly unwrap an object with some predefined props', () => {
       const source: Value<{ _buildFrom: string; a: string }> = {
         _buildFrom: 'block',
         a: '1'
@@ -58,6 +58,20 @@ describe('Value unwrapping', () => {
       const result = resolveValue(source, {}, [])
 
       expect(result).toEqual({ _buildFrom: 'block', a: '1' })
+    })
+
+    it('Should properly unwrap a `null`', () => {
+      const source: Value<null> = null
+      const result = resolveValue(source, {}, [])
+
+      expect(result).toBeNull()
+    })
+
+    it('Should properly unwrap an `undefined`', () => {
+      const source: Value<undefined> = undefined
+      const result = resolveValue(source, {}, [])
+
+      expect(result).toBeUndefined()
     })
   })
 

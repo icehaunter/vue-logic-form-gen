@@ -253,6 +253,38 @@ describe('resolveTree', () => {
       expect(resolved).toBeUndefined()
     })
 
+    it('should should resolve to `undefined` if else is not present and path is not available', () => {
+      const prepared = prepareBranch({
+        type: 'elif',
+        elifs: [
+          {
+            predicate: {
+              _modelPath: 'value'
+            },
+            then: {
+              type: 'level',
+              level: 'First child',
+              children: []
+            }
+          },
+          {
+            predicate: {
+              _modelPath: 'value'
+            },
+            then: {
+              type: 'level',
+              level: 'Second child',
+              children: []
+            }
+          }
+        ]
+      })
+
+      const resolved = resolveTree(prepared, { })
+
+      expect(resolved).toBeUndefined()
+    })
+
     it('should should resolve to an else branch if all else fails', () => {
       const prepared = prepareBranch({
         type: 'elif',
@@ -465,6 +497,22 @@ describe('resolveTree', () => {
       const resolved = resolveTree(prepared, {
         value: false
       })
+
+      expect(resolved).toBeUndefined()
+    })
+
+    it('should resolve to `undefined` if value is not present on the model', () => {
+      const prepared = prepareBranch({
+        type: 'for',
+        modelPath: 'value',
+        schema: {
+          type: 'level',
+          level: 'forChild',
+          children: []
+        }
+      })
+
+      const resolved = resolveTree(prepared, {})
 
       expect(resolved).toBeUndefined()
     })
