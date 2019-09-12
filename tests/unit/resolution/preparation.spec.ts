@@ -111,8 +111,7 @@ describe('prepareBranch', () => {
       expect(cacheMiss).toBe(2)
     })
 
-    // TODO: Reenable skipped test after resolution of underlying issue in the library https://github.com/theKashey/memoize-state/issues/35
-    it.skip('should properly memoize basic model-dependant branching if result is undefined', () => {
+    it('should properly memoize basic model-dependant branching if result is undefined', () => {
       const prepared = prepareBranch({
         type: 'if',
         predicate: {
