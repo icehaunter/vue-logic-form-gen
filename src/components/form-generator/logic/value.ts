@@ -14,10 +14,12 @@ export type Value<T> = T | ValueFromModel | ValueBuilder<T>
 
 export type WrapValue<T> = T extends ValueFromModel | ValueBuilder<T> ? T : Value<T>
 
-export type UnwrapValue<T> = T extends Value<infer P> ? P : T
+export type UnwrapValue<T> = T extends ValueFromModel | ValueBuilder<any, any> ? T extends ValueBuilder<infer P, any> ? P : any : T
 
 export type UnwrapValueArray<T extends any[]> = { [k in keyof T]: UnwrapValue<T[k]> }
 export type WrapValueArray<Arr extends any[]> = { [k in keyof Arr]: WrapValue<Arr[k]> }
+export type WrapValueObject<T extends object> = { [k in keyof T]: WrapValue<T[k]> }
+export type UnwrapValueObject<T extends object> = { [k in keyof T]: UnwrapValue<T[k]> }
 
 // type t = WrapValueArray<[ number ]>
 
