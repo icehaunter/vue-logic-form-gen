@@ -4,7 +4,13 @@ workflows:
   test:
     jobs:
       - test
+      - approval:
+          type: approval
+          requires:
+            - test
       - test-mutate:
+          requires:
+            - approval
           filters:
             branches:
               only:
