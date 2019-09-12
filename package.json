@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "core-js": "^2.6.5",
-    "date-fns": "^2.0.1",
+    "date-fns": "^2.1.0",
     "memoize-state": "^2.0.12",
     "vue": "^2.6.10"
   },
@@ -43,8 +43,8 @@
     "lint-staged": "^8.1.5",
     "prettier": "^1.18.2",
     "pretty-quick": "^1.11.1",
-    "sass": "^1.18.0",
-    "sass-loader": "^7.1.0",
+    "sass": "^1.22.12",
+    "sass-loader": "^7.3.1",
     "ts-jest": "^23.0.0",
     "ts-toolbelt": "^3.8.91",
     "typescript": "^3.6.3",
