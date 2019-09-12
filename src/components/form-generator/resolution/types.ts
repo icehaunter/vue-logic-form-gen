@@ -1,4 +1,5 @@
 import { Level as SchemaLevel, Field as SchemaField } from '../schema/types'
+import { PreparedValidator } from '../validation'
 
 /**
  * Resolution context for all `$each` parts of the model path
@@ -9,7 +10,9 @@ export type Context = Array<{
 }>
 
 export namespace Prepared {
-  type PreparedField = SchemaField
+  interface PreparedField extends Omit<SchemaField, 'validation'> {
+    validation?: Array<PreparedValidator>
+  }
 
   interface PreparedLevel extends Omit<SchemaLevel, 'children'> {
     children: Any[]
