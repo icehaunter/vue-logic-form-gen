@@ -11,13 +11,10 @@ import {
   differenceInWeeks,
   differenceInMonths,
   differenceInYears,
-  parseISO,
   isBefore,
   isAfter
 } from 'date-fns'
-
-export type DateStep = 'day' | 'week' | 'month' | 'year'
-export type DateLike = Date | 'now' | string
+import { DateStep, DateLike, getDate } from '../../../utils/date'
 
 export type DateModifierTypes = {
   add: (source: Date, amount: number, step: DateStep) => Date
@@ -25,16 +22,6 @@ export type DateModifierTypes = {
   difference: (source: Date, target: DateLike, step: DateStep) => number
   isBefore: (source: Date, target: DateLike) => boolean
   isAfter: (source: Date, target: DateLike) => boolean
-}
-
-function getDate (datelike: DateLike): Date {
-  if (datelike === 'now') {
-    return new Date()
-  } else if (typeof datelike !== 'string') {
-    return datelike
-  } else {
-    return parseISO(datelike)
-  }
 }
 
 export const modifiers: DateModifierTypes = {

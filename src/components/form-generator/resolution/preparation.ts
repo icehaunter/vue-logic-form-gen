@@ -10,6 +10,8 @@ import {
 import { Prepared, Context } from './types'
 import memoize from 'memoize-state'
 import { resolveValue } from '../logic'
+import { prepareValidator } from '../validation'
+import { resolveContextPath } from './model'
 
 type PreparedBranch = Prepared.Any
 
@@ -178,12 +180,25 @@ function prepareLevelBranch (level: Level): PreparedBranch {
 }
 
 /**
- * Prepare a field for the resolution. For now, it is not model-dependent.
+ * Prepare a field for the resolution.
+ * 
+ * Field preparation means preparing all the moving parts:
+ * - validations
+ * - modelPath
+ * 
  * @param field field for preparation
  */
 function prepareField (field: Field): PreparedBranch {
   return {
     _tag: 'field',
-    resolver: () => field
+    resolver: memoize((model, context) => {
+      const preparedValidations = field.validation && field.validation.map(prepareValidator(model, context))
+
+      return {
+        ...field,
+        validation: preparedValidations,
+        modelPath: resolveContextPath(field.modelPath, context).join('.')
+      }
+    })
   }
 }

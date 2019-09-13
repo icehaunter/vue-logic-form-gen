@@ -1,4 +1,5 @@
 import { Level as SchemaLevel, Field as SchemaField } from '../schema/types'
+import { PreparedValidator } from '../validation'
 
 /**
  * Resolution context for all `$each` parts of the model path
@@ -9,7 +10,9 @@ export type Context = Array<{
 }>
 
 export namespace Prepared {
-  type PreparedField = SchemaField
+  interface PreparedField extends Omit<SchemaField, 'validation'> {
+    validation?: Array<PreparedValidator>
+  }
 
   interface PreparedLevel extends Omit<SchemaLevel, 'children'> {
     children: Any[]
@@ -56,7 +59,7 @@ export namespace Resolved {
    * - It's children are resolved as well (no `if`s or `for`s or other logical splits)
    * - It has a resolution context for the model paths.
    */
-  export interface Level extends SchemaLevel, Contextualized {
+  export interface Level extends Omit<SchemaLevel, 'children'>, Contextualized {
     /**
      * Resolved children of the level
      */
@@ -66,5 +69,7 @@ export namespace Resolved {
   /**
    * Resolved field, but with resolution context added
    */
-  export interface Field extends SchemaField, Contextualized {}
+  export interface Field extends Omit<SchemaField, 'validation'>, Contextualized {
+    validation?: Array<PreparedValidator> | undefined
+  }
 }

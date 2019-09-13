@@ -1,5 +1,6 @@
 import { ModifierChain } from '../logic/modifiers'
 import { Value } from '../logic/value'
+import { ValidatorsSchema } from '../validation/validators'
 
 /**
  * This module contains the types for the building blocks of the
@@ -78,9 +79,7 @@ export interface ModelDependent extends TypedBlock {
 export interface Field extends ModelDependent {
   type: 'field'
   widget?: any
-  validation?: any
-  transform?: any
-  logic?: any
+  validation?: Array<ValidatorsSchema>
 }
 
 /**
