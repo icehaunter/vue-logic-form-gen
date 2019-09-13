@@ -8,6 +8,10 @@ workflows:
           type: approval
           requires:
             - test
+          filters:
+            branches:
+              only:
+                - master
       - test-mutate:
           requires:
             - approval
