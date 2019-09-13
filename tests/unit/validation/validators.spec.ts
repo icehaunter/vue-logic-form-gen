@@ -71,6 +71,12 @@ describe('all possible validators', () => {
       expect(validators.maxLength({ max: 2 })([1, 2])).toBe(true)
       expect(validators.maxLength({ max: 2 })([1, 2, 3])).toBe(false)
     })
+
+    it('should properly check object key size length', () => {
+      expect(validators.maxLength({ max: 2 })({ a: 1 })).toBe(true)
+      expect(validators.maxLength({ max: 2 })({ a: 1, b: 2 })).toBe(true)
+      expect(validators.maxLength({ max: 2 })({ a: 1, b: 2, c: 3 })).toBe(false)
+    })
   })
   describe('validator: minLength', () => {
     it('should ignore empty value', () => {
@@ -89,6 +95,12 @@ describe('all possible validators', () => {
       expect(validators.minLength({ min: 2 })([1])).toBe(false)
       expect(validators.minLength({ min: 2 })([1, 2])).toBe(true)
       expect(validators.minLength({ min: 2 })([1, 2, 3])).toBe(true)
+    })
+
+    it('should properly check object key size length', () => {
+      expect(validators.minLength({ min: 2 })({ a: 1 })).toBe(false)
+      expect(validators.minLength({ min: 2 })({ a: 1, b: 2 })).toBe(true)
+      expect(validators.minLength({ min: 2 })({ a: 1, b: 2, c: 3 })).toBe(true)
     })
   })
   describe('validator: lengthBetween', () => {
@@ -112,6 +124,19 @@ describe('all possible validators', () => {
       expect(validators.lengthBetween({ min: 2, max: 3 })([1, 2, 3, 4])).toBe(
         false
       )
+    })
+
+    it('should properly check object key size length', () => {
+      expect(validators.lengthBetween({ min: 2, max: 3 })({ a: 1 })).toBe(false)
+      expect(validators.lengthBetween({ min: 2, max: 3 })({ a: 1, b: 2 })).toBe(
+        true
+      )
+      expect(
+        validators.lengthBetween({ min: 2, max: 3 })({ a: 1, b: 2, c: 3 })
+      ).toBe(true)
+      expect(
+        validators.lengthBetween({ min: 2, max: 3 })({ a: 1, b: 2, c: 3, g: 4 })
+      ).toBe(false)
     })
   })
   describe('validator: minValue', () => {
@@ -250,38 +275,78 @@ describe('all possible validators', () => {
   })
   describe('validator: minDate', () => {
     it('should ignore empty value', () => {
-      expect(validators.minDate({ min: new Date('2019-01-01') })(new Date('what'))).toBe(true)
-      expect(validators.minDate({ min: new Date('2019-01-01') })(null)).toBe(true)
-      expect(validators.minDate({ min: new Date('2019-01-01') })(undefined)).toBe(true)
+      expect(
+        validators.minDate({ min: new Date('2019-01-01') })(new Date('what'))
+      ).toBe(true)
+      expect(validators.minDate({ min: new Date('2019-01-01') })(null)).toBe(
+        true
+      )
+      expect(
+        validators.minDate({ min: new Date('2019-01-01') })(undefined)
+      ).toBe(true)
     })
 
     it('should properly check date value', () => {
-      expect(validators.minDate({ min: new Date('2019-01-01') })(new Date('2019-01-10'))).toBe(true)
-      expect(validators.minDate({ min: '2019-01-01' })(new Date('2019-01-10'))).toBe(true)
-      expect(validators.minDate({ min: new Date('2019-01-15') })(new Date('2019-01-10'))).toBe(false)
-      expect(validators.minDate({ min: 'now' })(new Date('2019-01-10'))).toBe(false)
+      expect(
+        validators.minDate({ min: new Date('2019-01-01') })(
+          new Date('2019-01-10')
+        )
+      ).toBe(true)
+      expect(
+        validators.minDate({ min: '2019-01-01' })(new Date('2019-01-10'))
+      ).toBe(true)
+      expect(
+        validators.minDate({ min: new Date('2019-01-15') })(
+          new Date('2019-01-10')
+        )
+      ).toBe(false)
+      expect(validators.minDate({ min: 'now' })(new Date('2019-01-10'))).toBe(
+        false
+      )
     })
 
     it('should fail for invalid values', () => {
-      expect(validators.minDate({ min: new Date('what') })(new Date('2019-01-10'))).toBe(false)
+      expect(
+        validators.minDate({ min: new Date('what') })(new Date('2019-01-10'))
+      ).toBe(false)
     })
   })
   describe('validator: maxDate', () => {
     it('should ignore empty value', () => {
-      expect(validators.maxDate({ max: new Date('2019-01-01') })(new Date('what'))).toBe(true)
-      expect(validators.maxDate({ max: new Date('2019-01-01') })(null)).toBe(true)
-      expect(validators.maxDate({ max: new Date('2019-01-01') })(undefined)).toBe(true)
+      expect(
+        validators.maxDate({ max: new Date('2019-01-01') })(new Date('what'))
+      ).toBe(true)
+      expect(validators.maxDate({ max: new Date('2019-01-01') })(null)).toBe(
+        true
+      )
+      expect(
+        validators.maxDate({ max: new Date('2019-01-01') })(undefined)
+      ).toBe(true)
     })
 
     it('should properly check date value', () => {
-      expect(validators.maxDate({ max: new Date('2019-01-01') })(new Date('2019-01-10'))).toBe(false)
-      expect(validators.maxDate({ max: '2019-01-01' })(new Date('2019-01-10'))).toBe(false)
-      expect(validators.maxDate({ max: new Date('2019-01-15') })(new Date('2019-01-10'))).toBe(true)
-      expect(validators.maxDate({ max: 'now' })(new Date('2019-01-10'))).toBe(true)
+      expect(
+        validators.maxDate({ max: new Date('2019-01-01') })(
+          new Date('2019-01-10')
+        )
+      ).toBe(false)
+      expect(
+        validators.maxDate({ max: '2019-01-01' })(new Date('2019-01-10'))
+      ).toBe(false)
+      expect(
+        validators.maxDate({ max: new Date('2019-01-15') })(
+          new Date('2019-01-10')
+        )
+      ).toBe(true)
+      expect(validators.maxDate({ max: 'now' })(new Date('2019-01-10'))).toBe(
+        true
+      )
     })
 
     it('should fail for invalid values', () => {
-      expect(validators.maxDate({ max: new Date('what') })(new Date('2019-01-10'))).toBe(false)
+      expect(
+        validators.maxDate({ max: new Date('what') })(new Date('2019-01-10'))
+      ).toBe(false)
     })
   })
   describe('validator: pathIsNotNull', () => {
@@ -292,9 +357,20 @@ describe('all possible validators', () => {
     })
 
     it('should properly validate a value under the path', () => {
-      expect(validators.pathIsNotNull({ path: 'value' })({ value: '' })).toBe(true)
+      expect(validators.pathIsNotNull({ path: 'value' })({ value: '' })).toBe(
+        true
+      )
       expect(validators.pathIsNotNull({ path: 'value' })({})).toBe(true)
-      expect(validators.pathIsNotNull({ path: 'value' })({ value: null })).toBe(false)
+      expect(validators.pathIsNotNull({ path: 'value' })({ value: null })).toBe(
+        false
+      )
+      expect(
+        validators.pathIsNotNull({ path: 'value' })({ value: undefined })
+      ).toBe(false)
+    })
+
+    it('should return false if value is not an object', () => {
+      expect(validators.pathIsNotNull({ path: '' })('what')).toBe(false)
     })
   })
   describe('validator: predicate', () => {
