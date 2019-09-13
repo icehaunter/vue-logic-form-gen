@@ -1,4 +1,5 @@
 import { prepareBranch } from '@/components/form-generator/resolution'
+import { Prepared } from '@/components/form-generator/resolution/types'
 
 describe('prepareBranch', () => {
   it('should prepare a simple branch', () => {
@@ -19,19 +20,80 @@ describe('prepareBranch', () => {
     })
   })
 
-  it('should prepare a field', () => {
-    const prepared = prepareBranch({
-      type: 'field',
-      modelPath: ''
+  describe('Field preparation', () => {
+    it('should prepare a field', () => {
+      const prepared = prepareBranch({
+        type: 'field',
+        modelPath: 'value'
+      })
+
+      expect(prepared._tag).toBe('field')
+
+      const resolved = prepared.resolver({}, [])
+
+      expect(resolved).toEqual({
+        type: 'field',
+        modelPath: 'value'
+      })
     })
 
-    expect(prepared._tag).toBe('field')
+    it('should prepare modelPath based on context', () => {
+      const prepared = prepareBranch({
+        type: 'field',
+        modelPath: 'value.$each.test'
+      })
 
-    const resolved = prepared.resolver({}, [])
+      expect(prepared._tag).toBe('field')
 
-    expect(resolved).toEqual({
-      type: 'field',
-      modelPath: ''
+      const resolved = prepared.resolver({}, [
+        {
+          index: 2,
+          splitPoint: 'value'
+        }
+      ])
+
+      expect(resolved).toEqual({
+        type: 'field',
+        modelPath: 'value.2.test'
+      })
+    })
+
+    it('should prepare validations', () => {
+      const prepared = prepareBranch({
+        type: 'field',
+        modelPath: '',
+        validation: [
+          {
+            type: 'minLength',
+            errorMessage: 'test',
+            level: 'error',
+            params: { min: { _modelPath: 'min' } }
+          }
+        ]
+      }) as Prepared.Field
+
+      expect(prepared._tag).toBe('field')
+
+      const resolved = prepared.resolver({ min: 2 }, [
+        {
+          index: 2,
+          splitPoint: 'value'
+        }
+      ])
+
+      expect(resolved).toHaveProperty('type', 'field')
+      expect(resolved).toHaveProperty('modelPath', '')
+      expect(resolved).toHaveProperty('validation')
+
+      expect(resolved.validation).toHaveLength(1)
+      expect(resolved.validation![0]).toHaveProperty('type', 'minLength')
+      expect(resolved.validation![0]).toHaveProperty('errorMessage', 'test')
+      expect(resolved.validation![0]).toHaveProperty('level', 'error')
+      expect(resolved.validation![0]).toHaveProperty('predicate')
+
+      expect(resolved.validation![0].predicate('1')).toBe(false)
+      expect(resolved.validation![0].predicate('13')).toBe(true)
+      expect(resolved.validation![0].predicate('134')).toBe(true)
     })
   })
 
@@ -141,9 +203,7 @@ describe('prepareBranch', () => {
         type: 'if',
         predicate: {
           _buildFrom: false,
-          _actions: [
-            ['boolean', 'or', [{ _modelPath: 'value' }], 'boolean']
-          ]
+          _actions: [['boolean', 'or', [{ _modelPath: 'value' }], 'boolean']]
         },
         then: {
           type: 'level',
@@ -183,11 +243,17 @@ describe('prepareBranch', () => {
         }
       })
 
-      let resolved = prepared.resolver({ value: [true, false], other: true }, [])
+      let resolved = prepared.resolver(
+        { value: [true, false], other: true },
+        []
+      )
 
       expect(resolved).toHaveProperty('_tag', 'level')
 
-      resolved = prepared.resolver({ value: [true, false, true], other: false }, [])
+      resolved = prepared.resolver(
+        { value: [true, false, true], other: false },
+        []
+      )
 
       const { cacheHit, cacheMiss } = (prepared.resolver as any).cacheStatistics
 
@@ -202,9 +268,7 @@ describe('prepareBranch', () => {
           _buildFrom: {
             _modelPath: 'value.$each'
           },
-          _actions: [
-            ['boolean', 'not', [], 'boolean']
-          ]
+          _actions: [['boolean', 'not', [], 'boolean']]
         },
         then: {
           type: 'level',
@@ -222,17 +286,94 @@ describe('prepareBranch', () => {
 
       expect(resolved).toHaveProperty('_tag', 'level')
 
-      resolved = prepared.resolver({ value: [true, false, true], other: false }, [
-        {
-          splitPoint: 'value',
-          index: 1
-        }
-      ])
+      resolved = prepared.resolver(
+        { value: [true, false, true], other: false },
+        [
+          {
+            splitPoint: 'value',
+            index: 1
+          }
+        ]
+      )
 
       const { cacheHit, cacheMiss } = (prepared.resolver as any).cacheStatistics
 
       expect(cacheHit).toBe(1)
       expect(cacheMiss).toBe(1)
+    })
+
+    it('should properly memoize field resolution', () => {
+      const prepared = prepareBranch({
+        type: 'field',
+        modelPath: 'value.$each.me',
+        validation: [
+          {
+            type: 'minLength',
+            errorMessage: 'test',
+            level: 'error',
+            params: { min: { _modelPath: 'min' } }
+          }
+        ]
+      }) as Prepared.Field
+
+      expect(prepared._tag).toBe('field')
+
+      let resolved = prepared.resolver({ min: 2, other: 'test' }, [
+        {
+          index: 2,
+          splitPoint: 'value'
+        }
+      ])
+
+      resolved = prepared.resolver({ min: 2, other: 'please' }, [
+        {
+          index: 2,
+          splitPoint: 'value'
+        }
+      ])
+
+      expect((prepared.resolver as any).cacheStatistics.cacheHit).toBe(1)
+      expect((prepared.resolver as any).cacheStatistics.cacheMiss).toBe(1)
+
+      resolved = prepared.resolver({ min: 3, other: 'please' }, [
+        {
+          index: 2,
+          splitPoint: 'value'
+        }
+      ])
+
+      expect((prepared.resolver as any).cacheStatistics.cacheHit).toBe(1)
+      expect((prepared.resolver as any).cacheStatistics.cacheMiss).toBe(2)
+
+      resolved = prepared.resolver({ min: 3, other: 'ok' }, [
+        {
+          index: 2,
+          splitPoint: 'value'
+        }
+      ])
+
+      expect((prepared.resolver as any).cacheStatistics.cacheHit).toBe(2)
+      expect((prepared.resolver as any).cacheStatistics.cacheMiss).toBe(2)
+
+      resolved = prepared.resolver({ min: 3, other: 'please' }, [
+        {
+          index: 3,
+          splitPoint: 'value'
+        }
+      ])
+
+      expect((prepared.resolver as any).cacheStatistics.cacheHit).toBe(2)
+      expect((prepared.resolver as any).cacheStatistics.cacheMiss).toBe(3)
+
+      resolved = prepared.resolver({ min: 3, other: 'ok' }, [
+        {
+          index: 3,
+          splitPoint: 'value'
+        }
+      ])
+
+      expect((prepared.resolver as any).cacheStatistics.cacheHit).toBe(3)
+      expect((prepared.resolver as any).cacheStatistics.cacheMiss).toBe(3)
     })
   })
 })
