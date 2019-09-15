@@ -59,6 +59,7 @@ function prepareIfBranch (branch: If): PreparedBranch {
       const value = resolveValue(branch.predicate, model, context, {
         returnUndefined: true
       })
+      console.log('Resolving an `if` branch for value: ', value)
       if (value) return thenBranch
       else return elseBranch
     })
@@ -165,15 +166,18 @@ function prepareForBranch (branch: For): PreparedBranch {
 }
 
 /**
- * Prepare a level for resolution. Level resolution itself is not dependent on the model,
- * but all the children must be prepared.
+ * Prepare a level for resolution.
+ * 
+ * Level preparation means all the params, which need resolution as well
+ * as preparation of all the children
  * @param level level for preparation
  */
-function prepareLevelBranch (level: Level): PreparedBranch {
+function prepareLevelBranch (level: Level): Prepared.Level {
   return {
     _tag: 'level',
-    resolver: memoize(() => ({
+    resolver: memoize((model, context) => ({
       ...level,
+      classList: level.classList && level.classList.map((val) => resolveValue(val, model, context)),
       children: level.children.map(v => prepareBranch(v))
     }))
   }
@@ -185,17 +189,20 @@ function prepareLevelBranch (level: Level): PreparedBranch {
  * Field preparation means preparing all the moving parts:
  * - validations
  * - modelPath
+ * - classList
  * 
  * @param field field for preparation
  */
-function prepareField (field: Field): PreparedBranch {
+function prepareField (field: Field): Prepared.Field {
   return {
     _tag: 'field',
     resolver: memoize((model, context) => {
       const preparedValidations = field.validation && field.validation.map(prepareValidator(model, context))
+      const preparedClassList = field.classList && field.classList.map((val) => resolveValue(val, model, context))
 
       return {
         ...field,
+        classList: preparedClassList,
         validation: preparedValidations,
         modelPath: resolveContextPath(field.modelPath, context).join('.')
       }

@@ -10,12 +10,14 @@ export type Context = Array<{
 }>
 
 export namespace Prepared {
-  interface PreparedField extends Omit<SchemaField, 'validation'> {
+  interface PreparedField extends Omit<SchemaField, 'validation' | 'classList'> {
     validation?: Array<PreparedValidator>
+    classList?: string[]
   }
 
-  interface PreparedLevel extends Omit<SchemaLevel, 'children'> {
-    children: Any[]
+  interface PreparedLevel extends Omit<SchemaLevel, 'children' | 'classList'> {
+    children: Any[],
+    classList?: string[]
   }
 
   export interface Branch {
@@ -59,17 +61,19 @@ export namespace Resolved {
    * - It's children are resolved as well (no `if`s or `for`s or other logical splits)
    * - It has a resolution context for the model paths.
    */
-  export interface Level extends Omit<SchemaLevel, 'children'>, Contextualized {
+  export interface Level extends Omit<SchemaLevel, 'children' | 'classList'>, Contextualized {
     /**
      * Resolved children of the level
      */
-    children: (Field | Level)[]
+    children: (Field | Level)[],
+    classList?: string[]
   }
 
   /**
    * Resolved field, but with resolution context added
    */
-  export interface Field extends Omit<SchemaField, 'validation'>, Contextualized {
+  export interface Field extends Omit<SchemaField, 'validation' | 'classList'>, Contextualized {
     validation?: Array<PreparedValidator> | undefined
+    classList?: string[]
   }
 }
