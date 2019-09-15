@@ -12,7 +12,7 @@
     "build-library": "vue-cli-service build --target lib --name vue-logic-form-gen ./src/components/HelloWorld.vue"
   },
   "dependencies": {
-    "core-js": "^3.2.1",
+    "core-js": "^2.6.5",
     "date-fns": "^2.1.0",
     "memoize-state": "^2.0.12",
     "vue": "^2.6.10"
