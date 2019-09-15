@@ -1,18 +1,18 @@
 <template>
   <div ref="root">
-    <layout-generator :prepared="preparedSchema" :model="model">
+    <layout-builder :tree="resolvedSchema">
       <template v-slot:field>
         <div />
       </template>
-    </layout-generator>
-    <!-- <pre>{{ resolvedSchema }}</pre> -->
+    </layout-builder>
+    <pre style="text-align: left">{{ resolvedSchema }}</pre>
+
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-// import LayoutBuilder from './LayoutBuilder'
-import LayoutGenerator from './LayoutGenerator'
+import LayoutBuilder from './LayoutBuilder'
 import { LogicalBranch } from './schema/types'
 import { prepareBranch, resolveTree } from './resolution'
 import { Prepared } from './resolution/types'
@@ -29,25 +29,21 @@ export default Vue.extend({
       required: true
     }
   },
-  watch: {
-    model: {
-      deep: true,
-      handler () {
-        this.$forceUpdate()
-      }
-    }
-  },
-  components: { LayoutGenerator },
+  components: { LayoutBuilder },
   computed: {
     preparedSchema (): Prepared.Any {
       return prepareBranch(this.schema)
+    },
+    resolvedSchema (): ResolutionOptions | ResolutionOptions[] {
+      // return resolveTree(this.preparedSchema, this.model)
+      // ^
+      // Doesn't work, because the `this.model` is wrapped into a proxy under the hood
+      // which breaks both Vue and memoize-state reactivity
+      return resolveTree(this.preparedSchema, JSON.parse(JSON.stringify(this.model)))
+      // ^
+      // Works, because this causes resolution to trigger on each deep model change
+      // and drops Vue's getter/setter wrappings, so Proxy-based memoization works properly
     }
-    // resolvedSchema (): ResolutionOptions | ResolutionOptions[] {
-    //   console.log('resolution triggered', this.model)
-    //   // return this.model
-    //   return resolveTree(this.preparedSchema, { ...this.model })
-    //   // return this.model
-    // }
   }
 })
 </script>

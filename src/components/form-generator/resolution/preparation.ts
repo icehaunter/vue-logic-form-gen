@@ -59,7 +59,6 @@ function prepareIfBranch (branch: If): PreparedBranch {
       const value = resolveValue(branch.predicate, model, context, {
         returnUndefined: true
       })
-      console.log('Resolving an `if` branch for value: ', value)
       if (value) return thenBranch
       else return elseBranch
     })
