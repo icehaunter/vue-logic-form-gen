@@ -81,6 +81,7 @@ function branchRender (
     return h(
       'div',
       {
+        staticClass: `rendered--field`,
         class: branch.classList,
         attrs: branch.attrs
       },
