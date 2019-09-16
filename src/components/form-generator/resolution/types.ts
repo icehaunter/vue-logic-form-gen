@@ -1,5 +1,6 @@
 import { Level as SchemaLevel, Field as SchemaField } from '../schema/types'
 import { PreparedValidator } from '../validation'
+import { PreparedWidget } from '../widgets'
 
 /**
  * Resolution context for all `$each` parts of the model path
@@ -10,7 +11,8 @@ export type Context = Array<{
 }>
 
 export namespace Prepared {
-  interface PreparedField extends Omit<SchemaField, 'validation' | 'classList'> {
+  interface PreparedField extends Omit<SchemaField, 'validation' | 'classList' | 'widget'> {
+    widget: PreparedWidget
     validation?: Array<PreparedValidator>
     classList?: string[]
   }
@@ -72,7 +74,8 @@ export namespace Resolved {
   /**
    * Resolved field, but with resolution context added
    */
-  export interface Field extends Omit<SchemaField, 'validation' | 'classList'>, Contextualized {
+  export interface Field extends Omit<SchemaField, 'validation' | 'classList' | 'widget'>, Contextualized {
+    widget: PreparedWidget
     validation?: Array<PreparedValidator> | undefined
     classList?: string[]
   }

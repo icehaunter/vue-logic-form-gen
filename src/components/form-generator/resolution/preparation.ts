@@ -12,6 +12,7 @@ import memoize from 'memoize-state'
 import { resolveValue } from '../logic'
 import { prepareValidator } from '../validation'
 import { resolveContextPath } from './model'
+import { prepareWidget } from '../widgets'
 
 type PreparedBranch = Prepared.Any
 
@@ -196,11 +197,13 @@ function prepareField (field: Field): Prepared.Field {
   return {
     _tag: 'field',
     resolver: memoize((model, context) => {
+      const preparedWidget = prepareWidget(field.widget, model, context)
       const preparedValidations = field.validation && field.validation.map(prepareValidator(model, context))
       const preparedClassList = field.classList && field.classList.map((val) => resolveValue(val, model, context))
 
       return {
         ...field,
+        widget: preparedWidget,
         classList: preparedClassList,
         validation: preparedValidations,
         modelPath: resolveContextPath(field.modelPath, context).join('.')
