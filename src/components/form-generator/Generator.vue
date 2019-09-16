@@ -1,18 +1,17 @@
 <template>
   <div ref="root">
     <layout-builder :tree="resolvedSchema">
-      <template v-slot:field>
-        <div />
+      <template v-slot:field="field">
+        <pre style="text-align: left">{{ field }}</pre>
       </template>
     </layout-builder>
     <pre style="text-align: left">{{ resolvedSchema }}</pre>
-
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import LayoutBuilder from './LayoutBuilder'
+import LayoutBuilder from './layout/LayoutBuilder'
 import { LogicalBranch } from './schema/types'
 import { prepareBranch, resolveTree } from './resolution'
 import { Prepared } from './resolution/types'

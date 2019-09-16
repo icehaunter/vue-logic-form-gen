@@ -1,6 +1,6 @@
 import Vue, { CreateElement, RenderContext, VNode, PropType } from 'vue'
-import { ResolutionOptions } from './resolution/resolution'
-import { Resolved } from './resolution/types'
+import { ResolutionOptions } from '../resolution/resolution'
+import { Resolved } from '../resolution/types'
 
 type ResolvedBranch = NonNullable<ResolutionOptions>
 

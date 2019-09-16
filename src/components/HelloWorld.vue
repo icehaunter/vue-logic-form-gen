@@ -36,7 +36,12 @@ export default Vue.extend({
         then: {
           type: 'level',
           level: 'then',
-          children: []
+          children: [
+            {
+              type: 'field',
+              modelPath: 'value'
+            }
+          ]
         },
         else: {
           type: 'level',
