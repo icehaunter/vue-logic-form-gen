@@ -2,7 +2,8 @@
   <div ref="root">
     <layout-builder :tree="resolvedSchema">
       <template v-slot:field="field">
-        <pre style="text-align: left">{{ field }}</pre>
+        <!-- <pre style="text-align: left">{{ field }}</pre> -->
+        <component :is="lookup(field.widget.type)" v-bind="field.widget.params" />
       </template>
     </layout-builder>
     <pre style="text-align: left">{{ resolvedSchema }}</pre>
@@ -16,6 +17,9 @@ import { LogicalBranch } from './schema/types'
 import { prepareBranch, resolveTree } from './resolution'
 import { Prepared } from './resolution/types'
 import { ResolutionOptions } from './resolution/resolution'
+import { registry } from './widgets'
+import './widgets/basicWidgets/heading'
+import './widgets/basicWidgets/paragraph'
 
 export default Vue.extend({
   props: {
@@ -29,6 +33,11 @@ export default Vue.extend({
     }
   },
   components: { LayoutBuilder },
+  methods: {
+    lookup (key: string) {
+      return registry.lookup(key).component
+    }
+  },
   computed: {
     preparedSchema (): Prepared.Any {
       return prepareBranch(this.schema)
@@ -43,6 +52,9 @@ export default Vue.extend({
       // Works, because this causes resolution to trigger on each deep model change
       // and drops Vue's getter/setter wrappings, so Proxy-based memoization works properly
     }
+  },
+  mounted () {
+    console.log(registry.list())
   }
 })
 </script>
