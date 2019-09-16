@@ -23,7 +23,8 @@ export default Vue.extend({
       model: {
         deeply: {
           nested: {
-            value: true
+            value: true,
+            text: 'whatever'
           }
         },
         value: true
@@ -34,14 +35,16 @@ export default Vue.extend({
           _modelPath: 'deeply.nested.value'
         },
         then: {
-          type: 'level',
-          level: 'then',
-          children: [
-            {
-              type: 'field',
-              modelPath: 'value'
+          type: 'field',
+          modelPath: '',
+          widget: {
+            type: 'paragraph',
+            params: {
+              text: {
+                _modelPath: 'deeply.nested.text'
+              }
             }
-          ]
+          }
         },
         else: {
           type: 'level',
