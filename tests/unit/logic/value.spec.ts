@@ -2,7 +2,7 @@ import {
   resolveValue
 } from '@/components/form-generator/logic'
 import { Value } from '@/components/form-generator/logic/value'
-import { ModelValueUndefinedError, ModifierValueUndefinedError } from '@/components/form-generator/logic/errors'
+import { ModifierValueUndefinedError, ModelValueUndefinedError } from '@/components/form-generator/logic/errors'
 
 describe('Value unwrapping', () => {
   describe('Basic types', () => {

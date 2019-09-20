@@ -2,6 +2,8 @@ import {
   prepareBranch,
   resolveTree
 } from '@/components/form-generator/resolution'
+import { ResolutionResult } from '@/components/form-generator/resolution/resolution'
+import { Resolved } from '@/components/form-generator/resolution/types'
 
 describe('resolveTree', () => {
   it('should build a real tree based on the simple prepared one', () => {
@@ -14,6 +16,9 @@ describe('resolveTree', () => {
           children: [
             {
               type: 'field',
+              widget: {
+                type: 'span'
+              },
               modelPath: ''
             }
           ],
@@ -24,7 +29,7 @@ describe('resolveTree', () => {
 
     const resolved = resolveTree(prepared, {})
 
-    expect(resolved).toEqual({
+    expect(resolved).toMatchObject({
       _resolutionContext: [],
       type: 'level',
       level: 'parent',
@@ -61,7 +66,7 @@ describe('resolveTree', () => {
 
       const resolved = resolveTree(prepared, { value: true })
 
-      expect(resolved).toEqual({
+      expect(resolved).toMatchObject({
         _resolutionContext: [],
         type: 'level',
         children: [],
@@ -107,7 +112,7 @@ describe('resolveTree', () => {
 
       const resolved = resolveTree(prepared, { value: false })
 
-      expect(resolved).toEqual({
+      expect(resolved).toMatchObject({
         _resolutionContext: [],
         type: 'level',
         children: [],
@@ -134,7 +139,7 @@ describe('resolveTree', () => {
       })
 
       const resolved = resolveTree(prepared, {})
-      expect(resolved).toEqual({
+      expect(resolved).toMatchObject({
         _resolutionContext: [],
         type: 'level',
         children: [],
@@ -176,7 +181,7 @@ describe('resolveTree', () => {
 
       const resolved = resolveTree(prepared, { value: true })
 
-      expect(resolved).toEqual({
+      expect(resolved).toMatchObject({
         _resolutionContext: [],
         type: 'level',
         level: 'Second child',
@@ -213,7 +218,7 @@ describe('resolveTree', () => {
 
       const resolved = resolveTree(prepared, { value: true })
 
-      expect(resolved).toEqual({
+      expect(resolved).toMatchObject({
         _resolutionContext: [],
         type: 'level',
         level: 'First child',
@@ -315,7 +320,7 @@ describe('resolveTree', () => {
 
       const resolved = resolveTree(prepared, { value: true })
 
-      expect(resolved).toEqual({
+      expect(resolved).toMatchObject({
         _resolutionContext: [],
         type: 'level',
         level: 'Else',

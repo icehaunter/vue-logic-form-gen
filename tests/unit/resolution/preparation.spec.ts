@@ -24,6 +24,9 @@ describe('prepareBranch', () => {
     it('should prepare a field', () => {
       const prepared = prepareBranch({
         type: 'field',
+        widget: {
+          type: 'span'
+        },
         modelPath: 'value'
       })
 
@@ -33,13 +36,20 @@ describe('prepareBranch', () => {
 
       expect(resolved).toEqual({
         type: 'field',
-        modelPath: 'value'
+        modelPath: 'value',
+        validation: undefined,
+        widget: {
+          type: 'span'
+        }
       })
     })
 
     it('should prepare modelPath based on context', () => {
       const prepared = prepareBranch({
         type: 'field',
+        widget: {
+          type: 'span'
+        },
         modelPath: 'value.$each.test'
       })
 
@@ -54,7 +64,11 @@ describe('prepareBranch', () => {
 
       expect(resolved).toEqual({
         type: 'field',
-        modelPath: 'value.2.test'
+        modelPath: 'value.2.test',
+        validation: undefined,
+        widget: {
+          type: 'span'
+        }
       })
     })
 
@@ -62,6 +76,9 @@ describe('prepareBranch', () => {
       const prepared = prepareBranch({
         type: 'field',
         modelPath: '',
+        widget: {
+          type: 'span'
+        },
         validation: [
           {
             type: 'minLength',
@@ -306,6 +323,9 @@ describe('prepareBranch', () => {
       const prepared = prepareBranch({
         type: 'field',
         modelPath: 'value.$each.me',
+        widget: {
+          type: 'span'
+        },
         validation: [
           {
             type: 'minLength',
