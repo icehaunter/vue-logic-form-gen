@@ -82,7 +82,7 @@ describe('prepareBranch', () => {
         validation: [
           {
             type: 'minLength',
-            errorMessage: 'test',
+            message: 'test',
             level: 'error',
             params: { min: { _modelPath: 'min' } }
           }
@@ -104,7 +104,7 @@ describe('prepareBranch', () => {
 
       expect(resolved.validation).toHaveLength(1)
       expect(resolved.validation![0]).toHaveProperty('type', 'minLength')
-      expect(resolved.validation![0]).toHaveProperty('errorMessage', 'test')
+      expect(resolved.validation![0]).toHaveProperty('message', 'test')
       expect(resolved.validation![0]).toHaveProperty('level', 'error')
       expect(resolved.validation![0]).toHaveProperty('predicate')
 
@@ -329,7 +329,7 @@ describe('prepareBranch', () => {
         validation: [
           {
             type: 'minLength',
-            errorMessage: 'test',
+            message: 'test',
             level: 'error',
             params: { min: { _modelPath: 'min' } }
           }

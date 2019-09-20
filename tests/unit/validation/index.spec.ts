@@ -7,12 +7,12 @@ describe('validator preparation', () => {
 
     const result = preparer({
       type: 'always',
-      errorMessage: 'pls',
+      message: 'pls',
       level: 'error'
     })
 
     expect(result).toHaveProperty('type', 'always')
-    expect(result).toHaveProperty('errorMessage', 'pls')
+    expect(result).toHaveProperty('message', 'pls')
     expect(result).toHaveProperty('level', 'error')
     expect(result).toHaveProperty('predicate')
 
@@ -25,7 +25,7 @@ describe('validator preparation', () => {
 
     const result = preparer({
       type: 'maxLength',
-      errorMessage: 'pls',
+      message: 'pls',
       level: 'error',
       params: {
         max: 2
@@ -33,7 +33,7 @@ describe('validator preparation', () => {
     })
 
     expect(result).toHaveProperty('type', 'maxLength')
-    expect(result).toHaveProperty('errorMessage', 'pls')
+    expect(result).toHaveProperty('message', 'pls')
     expect(result).toHaveProperty('level', 'error')
     expect(result).toHaveProperty('predicate')
 
@@ -47,7 +47,7 @@ describe('validator preparation', () => {
 
     const result = preparer({
       type: 'maxLength',
-      errorMessage: 'pls',
+      message: 'pls',
       level: 'error',
       params: {
         max: {
@@ -57,7 +57,7 @@ describe('validator preparation', () => {
     })
 
     expect(result).toHaveProperty('type', 'maxLength')
-    expect(result).toHaveProperty('errorMessage', 'pls')
+    expect(result).toHaveProperty('message', 'pls')
     expect(result).toHaveProperty('level', 'error')
     expect(result).toHaveProperty('predicate')
 
@@ -71,7 +71,7 @@ describe('validator preparation', () => {
 
     const result = preparer({
       type: 'maxLength',
-      errorMessage: 'pls',
+      message: 'pls',
       level: 'error',
       params: {
         max: {
@@ -86,7 +86,7 @@ describe('validator preparation', () => {
     })
 
     expect(result).toHaveProperty('type', 'maxLength')
-    expect(result).toHaveProperty('errorMessage', 'pls')
+    expect(result).toHaveProperty('message', 'pls')
     expect(result).toHaveProperty('level', 'error')
     expect(result).toHaveProperty('predicate')
 
@@ -108,7 +108,7 @@ describe('validator collection', () => {
         {
           type: 'always',
           level: 'error',
-          errorMessage: 'always error'
+          message: 'always error'
         }
       ]
     })
@@ -117,18 +117,20 @@ describe('validator collection', () => {
 
     const validations = collectValidators(resolved)
 
-    expect(validations).toHaveLength(1)
-    expect(validations[0]).toHaveLength(2)
-    expect(validations[0][0]).toBe('test')
-    expect(validations[0][1]).toHaveLength(1)
-    expect(validations[0][1][0]).toMatchObject({
-      errorMessage: 'always error',
+    expect(validations).toHaveProperty('test')
+    expect(validations.test.error).toHaveLength(1)
+    expect(validations.test.warn).toHaveLength(0)
+    expect(validations.test.info).toHaveLength(0)
+    expect(validations.test.success).toHaveLength(0)
+
+    expect(validations.test.error[0]).toMatchObject({
+      message: 'always error',
       level: 'error',
       type: 'always'
     })
-    expect(validations[0][1][0]).toHaveProperty('predicate')
-    expect(validations[0][1][0].predicate(true)).toBe(true)
-    expect(validations[0][1][0].predicate(false)).toBe(true)
+    expect(validations.test.error[0]).toHaveProperty('predicate')
+    expect(validations.test.error[0].predicate(true)).toBe(true)
+    expect(validations.test.error[0].predicate(false)).toBe(true)
   })
 
   it('should properly collect a validator from a prepared level', () => {
@@ -146,7 +148,7 @@ describe('validator collection', () => {
             {
               type: 'always',
               level: 'error',
-              errorMessage: 'always error'
+              message: 'always error'
             }
           ]
         }
@@ -157,21 +159,23 @@ describe('validator collection', () => {
 
     const validations = collectValidators(resolved)
 
-    expect(validations).toHaveLength(1)
-    expect(validations[0]).toHaveLength(2)
-    expect(validations[0][0]).toBe('test')
-    expect(validations[0][1]).toHaveLength(1)
-    expect(validations[0][1][0]).toMatchObject({
-      errorMessage: 'always error',
+    expect(validations).toHaveProperty('test')
+    expect(validations.test.error).toHaveLength(1)
+    expect(validations.test.warn).toHaveLength(0)
+    expect(validations.test.info).toHaveLength(0)
+    expect(validations.test.success).toHaveLength(0)
+
+    expect(validations.test.error[0]).toMatchObject({
+      message: 'always error',
       level: 'error',
       type: 'always'
     })
-    expect(validations[0][1][0]).toHaveProperty('predicate')
-    expect(validations[0][1][0].predicate(true)).toBe(true)
-    expect(validations[0][1][0].predicate(false)).toBe(true)
+    expect(validations.test.error[0]).toHaveProperty('predicate')
+    expect(validations.test.error[0].predicate(true)).toBe(true)
+    expect(validations.test.error[0].predicate(false)).toBe(true)
   })
 
-  it('should return an empty array if no validations were specified', () => {
+  it('should collect nothing if no validations were specified', () => {
     const prepared = prepareBranch({
       type: 'level',
       level: 'top',
@@ -190,10 +194,10 @@ describe('validator collection', () => {
 
     const validations = collectValidators(resolved)
 
-    expect(validations).toEqual([])
+    expect(validations).toEqual({})
   })
 
-  it('should return all validators if for-loop is present', () => {
+  it('should collect all validators if for-loop is present', () => {
     const prepared = prepareBranch({
       type: 'for',
       modelPath: 'arr',
@@ -204,7 +208,7 @@ describe('validator collection', () => {
           type: 'span'
         },
         validation: [
-          { type: 'always', level: 'error', errorMessage: 'error' }
+          { type: 'always', level: 'error', message: 'error' }
         ]
       }
     })
@@ -215,11 +219,10 @@ describe('validator collection', () => {
 
     const validations = collectValidators(resolved)
 
-    expect(validations).toHaveLength(2)
-    expect(validations.map(([path]) => path)).toEqual(['arr.0', 'arr.1'])
+    expect(Object.keys(validations)).toEqual(['arr.0', 'arr.1'])
   })
 
-  it('should return empty array if tree was resolved to `undefined`', () => {
+  it('should return empty object if tree was resolved to `undefined`', () => {
     const prepared = prepareBranch({
       type: 'if',
       predicate: false,
@@ -232,7 +235,7 @@ describe('validator collection', () => {
         validation: [
           {
             type: 'always',
-            errorMessage: 'error',
+            message: 'error',
             level: 'error'
           }
         ]
@@ -243,7 +246,7 @@ describe('validator collection', () => {
 
     const validations = collectValidators(resolved)
 
-    expect(validations).toEqual([])
+    expect(validations).toEqual({})
   })
 
   it('should properly collect only validators in resolved branches', () => {
@@ -259,7 +262,7 @@ describe('validator collection', () => {
         validation: [
           {
             type: 'always',
-            errorMessage: 'error',
+            message: 'error',
             level: 'error'
           }
         ]
@@ -273,7 +276,7 @@ describe('validator collection', () => {
         validation: [
           {
             type: 'always',
-            errorMessage: 'error',
+            message: 'error',
             level: 'error'
           }
         ]
@@ -284,17 +287,19 @@ describe('validator collection', () => {
 
     const validations = collectValidators(resolved)
 
-    expect(validations).toHaveLength(1)
-    expect(validations[0]).toHaveLength(2)
-    expect(validations[0][0]).toBe('other')
-    expect(validations[0][1]).toHaveLength(1)
-    expect(validations[0][1][0]).toMatchObject({
-      errorMessage: 'error',
+    expect(validations).toHaveProperty('other')
+    expect(validations.other.error).toHaveLength(1)
+    expect(validations.other.warn).toHaveLength(0)
+    expect(validations.other.info).toHaveLength(0)
+    expect(validations.other.success).toHaveLength(0)
+
+    expect(validations.other.error[0]).toMatchObject({
+      message: 'error',
       level: 'error',
       type: 'always'
     })
-    expect(validations[0][1][0]).toHaveProperty('predicate')
-    expect(validations[0][1][0].predicate(true)).toBe(true)
-    expect(validations[0][1][0].predicate(false)).toBe(true)
+    expect(validations.other.error[0]).toHaveProperty('predicate')
+    expect(validations.other.error[0].predicate(true)).toBe(true)
+    expect(validations.other.error[0].predicate(false)).toBe(true)
   })
 })
