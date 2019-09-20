@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
-    <div><label><input type="checkbox" v-model="model.deeply.nested.value" /> Test</label></div>
+    <div><label><input type="checkbox" v-model="model.value" />Value</label></div>
+    <div><label><input type="checkbox" v-model="model.deeply.nested.value" />Deeply nested value</label></div>
     <generator :model="model" :schema="schema" />
   </div>
 </template>
@@ -32,11 +33,11 @@ export default Vue.extend({
       schema: {
         type: 'if',
         predicate: {
-          _modelPath: 'deeply.nested.value'
+          _modelPath: 'value'
         },
         then: {
           type: 'field',
-          modelPath: '',
+          modelPath: 'deeply.nested.value',
           widget: {
             type: 'paragraph',
             params: {
@@ -44,7 +45,16 @@ export default Vue.extend({
                 _modelPath: 'deeply.nested.text'
               }
             }
-          }
+          },
+          validation: [
+            {
+              type: 'required',
+              message: 'Value should not be "false"',
+              level: 'warn',
+              runOnEmpty: true
+            },
+            { type: 'isTrue', message: 'should be true', level: 'info', runOnEmpty: true }
+          ]
         },
         else: {
           type: 'level',
