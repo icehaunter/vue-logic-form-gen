@@ -7,7 +7,7 @@ import { Prepared, Context, Resolved } from './types'
  * or `undefined` in case the branch must be omitted (like an `else` branch in an if
  * statement which is true)
  */
-export type ResolutionOptions = Resolved.Field | Resolved.Level | undefined
+export type ResolutionResult = Resolved.Any | Array<Resolved.Any> | undefined
 
 /**
  * Resolution of the prepared branch. This means we don't know anything
@@ -100,7 +100,7 @@ function resolveBranch (
   branch: Prepared.Any,
   model: any,
   context: Context
-): ResolutionOptions | NonNullable<ResolutionOptions>[] {
+): ResolutionResult {
   switch (branch._tag) {
     case 'branch':
       return resolvePreparedBranch(branch, model, context)
@@ -127,6 +127,6 @@ function resolveBranch (
 export function resolveTree (
   root: Prepared.Any,
   model: any
-): ResolutionOptions | NonNullable<ResolutionOptions>[] {
+): ResolutionResult {
   return resolveBranch(root, model, [])
 }

@@ -79,4 +79,6 @@ export namespace Resolved {
     validation?: Array<PreparedValidator> | undefined
     classList?: string[]
   }
+
+  export type Any = Level | Field
 }

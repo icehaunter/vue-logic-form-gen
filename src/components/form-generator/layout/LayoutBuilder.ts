@@ -1,11 +1,9 @@
 import Vue, { CreateElement, RenderContext, VNode, PropType } from 'vue'
-import { ResolutionOptions } from '../resolution/resolution'
+import { ResolutionResult } from '../resolution/resolution'
 import { Resolved } from '../resolution/types'
 
-type ResolvedBranch = NonNullable<ResolutionOptions>
-
 interface IProps {
-  tree: ResolutionOptions | ResolvedBranch[]
+  tree: ResolutionResult
 }
 
 function buildLevelLayout (
@@ -73,7 +71,7 @@ function buildLevelLayout (
 }
 
 function branchRender (
-  branch: ResolvedBranch,
+  branch: Resolved.Any,
   h: CreateElement,
   context: RenderContext<IProps>
 ): VNode {
@@ -97,7 +95,7 @@ export default Vue.extend<IProps>({
   functional: true,
   props: {
     tree: {
-      type: [Object, Array] as PropType<ResolutionOptions | ResolvedBranch[]>
+      type: [Object, Array] as PropType<ResolutionResult>
     }
   },
   render (h, context) {

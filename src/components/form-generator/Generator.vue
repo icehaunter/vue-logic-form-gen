@@ -16,7 +16,7 @@ import LayoutBuilder from './layout/LayoutBuilder'
 import { LogicalBranch } from './schema/types'
 import { prepareBranch, resolveTree } from './resolution'
 import { Prepared } from './resolution/types'
-import { ResolutionOptions } from './resolution/resolution'
+import { ResolutionResult } from './resolution/resolution'
 import { registry } from './widgets'
 import './widgets/basicWidgets/heading'
 import './widgets/basicWidgets/paragraph'
@@ -42,7 +42,7 @@ export default Vue.extend({
     preparedSchema (): Prepared.Any {
       return prepareBranch(this.schema)
     },
-    resolvedSchema (): ResolutionOptions | ResolutionOptions[] {
+    resolvedSchema (): ResolutionResult {
       // return resolveTree(this.preparedSchema, this.model)
       // ^
       // Doesn't work, because the `this.model` is wrapped into a proxy under the hood
