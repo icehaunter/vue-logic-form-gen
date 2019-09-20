@@ -75,9 +75,11 @@ function resolvePreparedLevel (branch: Prepared.Level, model: any, context: Cont
  */
 function resolvePreparedField (branch: Prepared.Field, model: any, context: Context): Resolved.Field {
   const resolved = branch.resolver(model, context)
+  const validation = resolved.validation && resolved.validation(model, context)
 
   return {
     ...resolved,
+    validation: validation,
     _resolutionContext: context
   }
 }
