@@ -1,5 +1,5 @@
 import { Level as SchemaLevel, Field as SchemaField } from '../schema/types'
-import { PreparedValidator } from '../validation'
+import { ValidationCurriedApplier } from '../validation'
 import { PreparedWidget } from '../widgets'
 
 /**
@@ -13,7 +13,7 @@ export type Context = Array<{
 export namespace Prepared {
   interface PreparedField extends Omit<SchemaField, 'validation' | 'classList' | 'widget'> {
     widget: PreparedWidget
-    validation?: Array<PreparedValidator>
+    validation?: (model: any, context: Context) => ValidationCurriedApplier
     classList?: string[]
   }
 
@@ -76,7 +76,7 @@ export namespace Resolved {
    */
   export interface Field extends Omit<SchemaField, 'validation' | 'classList' | 'widget'>, Contextualized {
     widget: PreparedWidget
-    validation?: Array<PreparedValidator> | undefined
+    validation?: ValidationCurriedApplier | undefined
     classList?: string[]
   }
 
