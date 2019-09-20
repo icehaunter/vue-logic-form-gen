@@ -3,6 +3,7 @@ import { resolveValue } from '../logic'
 import { Context } from '../resolution'
 import { ResolutionResult } from '../resolution/resolution'
 import { ValidatorLevel } from './types'
+import { groupByKey } from '@/utils/arrayTraversal'
 
 export interface PreparedValidator extends Omit<ValidatorsSchema, 'params'> {
   predicate: (value: any) => boolean
@@ -26,11 +27,12 @@ export const prepareValidator = (model: any, context: Context) => (validator: Va
     type: validator.type,
     message: validator.message,
     level: validator.level,
+    runOnEmpty: validator.runOnEmpty,
     predicate: predicate
   }
 }
 
-type ModelValidators = [string, PreparedValidator[]]
+type ModelValidators = [string, ValidationCurriedApplier]
 
 function _collectValidators (resolved: ResolutionResult): Array<ModelValidators> {
   if (resolved === undefined) {
@@ -46,22 +48,48 @@ function _collectValidators (resolved: ResolutionResult): Array<ModelValidators>
   }
 }
 
-type ValidatorMap = {[k: string]: { [k in ValidatorLevel]: PreparedValidator[] }}
+export type ValidationResult = { [k in ValidatorLevel]: string[] }
 
-export function collectValidators (resolved: ResolutionResult): ValidatorMap {
-  return _collectValidators(resolved).reduce((agg, [path, validators]) => {
-    if (!(path in agg)) {
-      agg[path] = {
-        error: [],
-        warn: [],
-        info: [],
-        success: []
-      }
+export type ValidationApplier = (value: any) => ValidationCurriedApplier
+
+export type ValidationCurriedApplier = (dirty: boolean) => ValidationResult
+
+export type CollectedValidators = { [k: string]: ValidationCurriedApplier }
+
+// function groupValidators (agg: { [k: string]: PreparedValidator[] }, [path, validators]: [string, PreparedValidator[]]): {}
+
+const buildValidationApplier = (validators: PreparedValidator[]): ValidationApplier => (value) => (dirty) => {
+  return validators.reduce((result, validator) => {
+    if ((validator.runOnEmpty || dirty) && !validator.predicate(value)) {
+      result[validator.level].push(validator.message)
     }
-
-    validators.forEach(v => agg[path][v.level].push(v))
-    return agg
-  }, {} as ValidatorMap)
+    return result
+  }, {
+    error: [],
+    info: [],
+    success: [],
+    warn: []
+  } as ValidationResult)
 }
 
-// export function applyValidators (path)
+export function prepareAppliedValidator (validators: ValidatorsSchema[], model: any, context: Context) {
+  return buildValidationApplier(validators.map(prepareValidator(model, context)))
+}
+
+function mergeValidationResults (a: ValidationResult, b: ValidationResult): ValidationResult {
+  return {
+    error: a.error.concat(b.error),
+    warn: a.warn.concat(b.warn),
+    success: a.success.concat(b.success),
+    info: a.info.concat(b.info)
+  }
+}
+
+export function collectValidators (resolved: ResolutionResult): CollectedValidators {
+  const grouped = groupByKey(_collectValidators(resolved))
+
+  return Object.keys(grouped).reduce((agg, key) => {
+    agg[key] = (dirty: boolean) => grouped[key].map(a => a(dirty)).reduce(mergeValidationResults)
+    return agg
+  }, {} as CollectedValidators)
+}
