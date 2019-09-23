@@ -1,5 +1,6 @@
 import { Level as SchemaLevel, Field as SchemaField } from '../schema/types'
-import { PreparedValidator } from '../validation'
+import { ValidationCurriedApplier } from '../validation'
+import { PreparedWidget } from '../widgets'
 
 /**
  * Resolution context for all `$each` parts of the model path
@@ -10,12 +11,15 @@ export type Context = Array<{
 }>
 
 export namespace Prepared {
-  interface PreparedField extends Omit<SchemaField, 'validation'> {
-    validation?: Array<PreparedValidator>
+  interface PreparedField extends Omit<SchemaField, 'validation' | 'classList' | 'widget'> {
+    widget: PreparedWidget
+    validation?: (model: any, context: Context) => ValidationCurriedApplier
+    classList?: string[]
   }
 
-  interface PreparedLevel extends Omit<SchemaLevel, 'children'> {
-    children: Any[]
+  interface PreparedLevel extends Omit<SchemaLevel, 'children' | 'classList'> {
+    children: Any[],
+    classList?: string[]
   }
 
   export interface Branch {
@@ -59,17 +63,22 @@ export namespace Resolved {
    * - It's children are resolved as well (no `if`s or `for`s or other logical splits)
    * - It has a resolution context for the model paths.
    */
-  export interface Level extends Omit<SchemaLevel, 'children'>, Contextualized {
+  export interface Level extends Omit<SchemaLevel, 'children' | 'classList'>, Contextualized {
     /**
      * Resolved children of the level
      */
-    children: (Field | Level)[]
+    children: (Field | Level)[],
+    classList?: string[]
   }
 
   /**
    * Resolved field, but with resolution context added
    */
-  export interface Field extends Omit<SchemaField, 'validation'>, Contextualized {
-    validation?: Array<PreparedValidator> | undefined
+  export interface Field extends Omit<SchemaField, 'validation' | 'classList' | 'widget'>, Contextualized {
+    widget: PreparedWidget
+    validation?: ValidationCurriedApplier | undefined
+    classList?: string[]
   }
+
+  export type Any = Level | Field
 }

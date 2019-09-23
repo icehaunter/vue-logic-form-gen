@@ -1,6 +1,7 @@
 import { ModifierChain } from '../logic/modifiers'
 import { Value } from '../logic/value'
 import { ValidatorsSchema } from '../validation/validators'
+import { WidgetSchema } from '../widgets/types'
 
 /**
  * This module contains the types for the building blocks of the
@@ -36,9 +37,31 @@ interface TypedBlock {
 }
 
 /**
+ * A block, which has a direct representation in the DOM,
+ * and, as such, can have some properties to be rendered there
+ */
+interface DOMBlock {
+  /**
+   * A list of classes to be applied to the div.
+   * 
+   * Each class can be resolved from the model if needed.
+   */
+  classList?: Value<string>[]
+
+  /**
+   * Attributes object, applied directly to the div.
+   * 
+   * This will be passed directly to the `data.attrs` in
+   * Vue render function, so see the documentation for everything
+   * available there. https://vuejs.org/v2/guide/render-function.html#The-Data-Object-In-Depth
+   */
+  attrs?: object
+}
+
+/**
  * A level in the form tree.
  */
-export interface Level extends TypedBlock {
+export interface Level extends TypedBlock, DOMBlock {
   type: 'level'
   /**
    * Can be anything. Affects only the class of the rendered div.
@@ -76,9 +99,9 @@ export interface ModelDependent extends TypedBlock {
  * A leaf in the form tree. Represents the actual field to be rendered
  * within the markup.
  */
-export interface Field extends ModelDependent {
+export interface Field extends ModelDependent, DOMBlock {
   type: 'field'
-  widget?: any
+  widget: WidgetSchema
   validation?: Array<ValidatorsSchema>
 }
 

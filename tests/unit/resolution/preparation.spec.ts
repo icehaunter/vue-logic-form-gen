@@ -20,10 +20,33 @@ describe('prepareBranch', () => {
     })
   })
 
+  it('should prepare classList on the level', () => {
+    const prepared = prepareBranch({
+      type: 'level',
+      children: [],
+      level: 'test',
+      classList: ['test', { _modelPath: 'class' }]
+    })
+
+    expect(prepared._tag).toBe('level')
+
+    const resolved = prepared.resolver({ class: 'other_test' }, [])
+
+    expect(resolved).toEqual({
+      type: 'level',
+      children: [],
+      level: 'test',
+      classList: ['test', 'other_test']
+    })
+  })
+
   describe('Field preparation', () => {
     it('should prepare a field', () => {
       const prepared = prepareBranch({
         type: 'field',
+        widget: {
+          type: 'span'
+        },
         modelPath: 'value'
       })
 
@@ -33,13 +56,45 @@ describe('prepareBranch', () => {
 
       expect(resolved).toEqual({
         type: 'field',
-        modelPath: 'value'
+        modelPath: 'value',
+        validation: undefined,
+        widget: {
+          type: 'span'
+        }
+      })
+    })
+
+    it('should prepare classList for the field', () => {
+      const prepared = prepareBranch({
+        type: 'field',
+        widget: {
+          type: 'span'
+        },
+        modelPath: '',
+        classList: ['test', { _modelPath: 'testClass' }]
+      })
+
+      expect(prepared._tag).toBe('field')
+
+      const resolved = prepared.resolver({ testClass: 'other_test' }, [])
+
+      expect(resolved).toEqual({
+        type: 'field',
+        modelPath: '',
+        validation: undefined,
+        widget: {
+          type: 'span'
+        },
+        classList: ['test', 'other_test']
       })
     })
 
     it('should prepare modelPath based on context', () => {
       const prepared = prepareBranch({
         type: 'field',
+        widget: {
+          type: 'span'
+        },
         modelPath: 'value.$each.test'
       })
 
@@ -54,18 +109,25 @@ describe('prepareBranch', () => {
 
       expect(resolved).toEqual({
         type: 'field',
-        modelPath: 'value.2.test'
+        modelPath: 'value.2.test',
+        validation: undefined,
+        widget: {
+          type: 'span'
+        }
       })
     })
 
     it('should prepare validations', () => {
       const prepared = prepareBranch({
         type: 'field',
-        modelPath: '',
+        modelPath: 'value',
+        widget: {
+          type: 'span'
+        },
         validation: [
           {
             type: 'minLength',
-            errorMessage: 'test',
+            message: 'test',
             level: 'error',
             params: { min: { _modelPath: 'min' } }
           }
@@ -82,18 +144,18 @@ describe('prepareBranch', () => {
       ])
 
       expect(resolved).toHaveProperty('type', 'field')
-      expect(resolved).toHaveProperty('modelPath', '')
+      expect(resolved).toHaveProperty('modelPath', 'value')
       expect(resolved).toHaveProperty('validation')
 
-      expect(resolved.validation).toHaveLength(1)
-      expect(resolved.validation![0]).toHaveProperty('type', 'minLength')
-      expect(resolved.validation![0]).toHaveProperty('errorMessage', 'test')
-      expect(resolved.validation![0]).toHaveProperty('level', 'error')
-      expect(resolved.validation![0]).toHaveProperty('predicate')
+      expect(resolved.validation).toBeDefined()
 
-      expect(resolved.validation![0].predicate('1')).toBe(false)
-      expect(resolved.validation![0].predicate('13')).toBe(true)
-      expect(resolved.validation![0].predicate('134')).toBe(true)
+      const result = resolved.validation!({ value: 'a' }, [])(true)
+      expect(result.info).toHaveLength(0)
+      expect(result.warn).toHaveLength(0)
+      expect(result.success).toHaveLength(0)
+      expect(result.error).toHaveLength(1)
+
+      expect(result.error[0]).toEqual('test')
     })
   })
 
@@ -306,10 +368,13 @@ describe('prepareBranch', () => {
       const prepared = prepareBranch({
         type: 'field',
         modelPath: 'value.$each.me',
+        widget: {
+          type: 'span'
+        },
         validation: [
           {
             type: 'minLength',
-            errorMessage: 'test',
+            message: 'test',
             level: 'error',
             params: { min: { _modelPath: 'min' } }
           }

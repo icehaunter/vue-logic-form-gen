@@ -7,7 +7,7 @@ import { Prepared, Context, Resolved } from './types'
  * or `undefined` in case the branch must be omitted (like an `else` branch in an if
  * statement which is true)
  */
-type ResolutionOptions = Resolved.Field | Resolved.Level | undefined
+export type ResolutionResult = Resolved.Any | Array<Resolved.Any> | undefined
 
 /**
  * Resolution of the prepared branch. This means we don't know anything
@@ -42,7 +42,7 @@ function resolvePreparedBranchArray (branch: Prepared.BranchArray, model: any, c
         ...context,
         { splitPoint: branch.splitPoint, index }
       ])
-    )
+    ).filter(<T>(v: T): v is NonNullable<T> => v !== undefined)
   )
 }
 
@@ -53,7 +53,7 @@ function resolvePreparedBranchArray (branch: Prepared.BranchArray, model: any, c
  * @param model Model for dependecies resolution
  * @param context Context for model path resolution
  */
-function resolvePreparedLevel (branch: Prepared.Level, model: any, context: Context) {
+function resolvePreparedLevel (branch: Prepared.Level, model: any, context: Context): Resolved.Level {
   const resolved = branch.resolver(model, context)
 
   const resolvedChildren = resolved.children
@@ -73,11 +73,13 @@ function resolvePreparedLevel (branch: Prepared.Level, model: any, context: Cont
  * @param model Model for dependecies resolution
  * @param context Context for model path resolution
  */
-function resolvePreparedField (branch: Prepared.Field, model: any, context: Context) {
+function resolvePreparedField (branch: Prepared.Field, model: any, context: Context): Resolved.Field {
   const resolved = branch.resolver(model, context)
+  const validation = resolved.validation && resolved.validation(model, context)
 
   return {
     ...resolved,
+    validation: validation,
     _resolutionContext: context
   }
 }
@@ -100,7 +102,7 @@ function resolveBranch (
   branch: Prepared.Any,
   model: any,
   context: Context
-): ResolutionOptions | ResolutionOptions[] {
+): ResolutionResult {
   switch (branch._tag) {
     case 'branch':
       return resolvePreparedBranch(branch, model, context)
@@ -127,6 +129,6 @@ function resolveBranch (
 export function resolveTree (
   root: Prepared.Any,
   model: any
-): ResolutionOptions | ResolutionOptions[] {
+): ResolutionResult {
   return resolveBranch(root, model, [])
 }

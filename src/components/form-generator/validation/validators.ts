@@ -37,7 +37,7 @@ export type Validators = BuildValidators<ValidatorParamTypes>
 const emailRegex = /(^$|^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$)/
 
 export const validators: Validators = {
-  always: () => () => true,
+  always: () => () => false,
   required: () => req,
   isTrue: () => val => val === true,
   isTruthy: () => val => Boolean(val),
