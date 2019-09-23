@@ -75,7 +75,7 @@ describe('prepareBranch', () => {
     it('should prepare validations', () => {
       const prepared = prepareBranch({
         type: 'field',
-        modelPath: '',
+        modelPath: 'value',
         widget: {
           type: 'span'
         },
@@ -99,18 +99,18 @@ describe('prepareBranch', () => {
       ])
 
       expect(resolved).toHaveProperty('type', 'field')
-      expect(resolved).toHaveProperty('modelPath', '')
+      expect(resolved).toHaveProperty('modelPath', 'value')
       expect(resolved).toHaveProperty('validation')
 
-      expect(resolved.validation).toHaveLength(1)
-      expect(resolved.validation![0]).toHaveProperty('type', 'minLength')
-      expect(resolved.validation![0]).toHaveProperty('message', 'test')
-      expect(resolved.validation![0]).toHaveProperty('level', 'error')
-      expect(resolved.validation![0]).toHaveProperty('predicate')
+      expect(resolved.validation).toBeDefined()
 
-      expect(resolved.validation![0].predicate('1')).toBe(false)
-      expect(resolved.validation![0].predicate('13')).toBe(true)
-      expect(resolved.validation![0].predicate('134')).toBe(true)
+      const result = resolved.validation!({ value: 'a' }, [])(true)
+      expect(result.info).toHaveLength(0)
+      expect(result.warn).toHaveLength(0)
+      expect(result.success).toHaveLength(0)
+      expect(result.error).toHaveLength(1)
+
+      expect(result.error[0]).toEqual('test')
     })
   })
 
