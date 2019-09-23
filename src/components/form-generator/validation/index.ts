@@ -41,7 +41,7 @@ function _collectValidators (resolved: ResolutionResult): Array<ModelValidators>
     return resolved.flatMap(_collectValidators)
   } else if (resolved.type === 'level') {
     return resolved.children.flatMap(_collectValidators)
-  } else if (resolved.validation !== undefined) {
+  } else if (resolved.validation !== undefined && resolved.modelPath !== undefined) {
     return [[resolved.modelPath, resolved.validation]]
   } else {
     return []

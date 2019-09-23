@@ -99,9 +99,24 @@ export interface ModelDependent extends TypedBlock {
  * A leaf in the form tree. Represents the actual field to be rendered
  * within the markup.
  */
-export interface Field extends ModelDependent, DOMBlock {
+export interface Field extends TypedBlock, DOMBlock {
   type: 'field'
   widget: WidgetSchema
+  /**
+   * Dot-separated path within the model object. This is the
+   * path to be bound to the field and updated accordingly
+   *
+   * If the leaf is within a `For` construct, current array index can
+   * be referenced by `$each` in place of the index.
+   *
+   * Examples:
+   * ```
+   * path.within.object
+   * path.within.array.$each
+   * array.$each.object
+   * ```
+   */
+  modelPath?: string
   validation?: Array<ValidatorsSchema>
 }
 
