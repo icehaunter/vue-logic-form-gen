@@ -20,6 +20,26 @@ describe('prepareBranch', () => {
     })
   })
 
+  it('should prepare classList on the level', () => {
+    const prepared = prepareBranch({
+      type: 'level',
+      children: [],
+      level: 'test',
+      classList: ['test', { _modelPath: 'class' }]
+    })
+
+    expect(prepared._tag).toBe('level')
+
+    const resolved = prepared.resolver({ class: 'other_test' }, [])
+
+    expect(resolved).toEqual({
+      type: 'level',
+      children: [],
+      level: 'test',
+      classList: ['test', 'other_test']
+    })
+  })
+
   describe('Field preparation', () => {
     it('should prepare a field', () => {
       const prepared = prepareBranch({
@@ -41,6 +61,31 @@ describe('prepareBranch', () => {
         widget: {
           type: 'span'
         }
+      })
+    })
+
+    it('should prepare classList for the field', () => {
+      const prepared = prepareBranch({
+        type: 'field',
+        widget: {
+          type: 'span'
+        },
+        modelPath: '',
+        classList: ['test', { _modelPath: 'testClass' }]
+      })
+
+      expect(prepared._tag).toBe('field')
+
+      const resolved = prepared.resolver({ testClass: 'other_test' }, [])
+
+      expect(resolved).toEqual({
+        type: 'field',
+        modelPath: '',
+        validation: undefined,
+        widget: {
+          type: 'span'
+        },
+        classList: ['test', 'other_test']
       })
     })
 
