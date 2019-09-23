@@ -247,6 +247,49 @@ describe('validator collection', () => {
     expect(validations).toEqual({})
   })
 
+  it('should collect and apply all validators if multiple fields specify them', () => {
+    const prepared = prepareBranch({
+      type: 'level',
+      level: 'test',
+      children: [{
+        type: 'field',
+        modelPath: 'arr',
+        widget: {
+          type: 'span'
+        },
+        validation: [
+          { type: 'always', level: 'error', message: 'error' },
+          { type: 'always', level: 'info', message: 'info' }
+        ]
+      },
+      {
+        type: 'field',
+        modelPath: 'arr',
+        widget: {
+          type: 'span'
+        },
+        validation: [
+          { type: 'always', level: 'error', message: 'other error' }
+        ]
+      }]
+    })
+
+    const resolved = resolveTree(prepared, {
+      arr: ['a', 'b']
+    })
+
+    const validations = collectValidators(resolved)
+
+    expect(validations).toHaveProperty('arr')
+
+    const applied = validations.arr(true)
+
+    expect(applied.error).toHaveLength(2)
+    expect(applied.error).toContain('error')
+    expect(applied.error).toContain('other error')
+    expect(applied.info).toHaveLength(1)
+  })
+
   it('should properly collect only validators in resolved branches', () => {
     const prepared = prepareBranch({
       type: 'if',
