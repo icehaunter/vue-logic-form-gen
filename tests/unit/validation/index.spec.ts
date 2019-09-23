@@ -16,8 +16,8 @@ describe('validator preparation', () => {
     expect(result).toHaveProperty('level', 'error')
     expect(result).toHaveProperty('predicate')
 
-    expect(result.predicate('test')).toBe(true)
-    expect(result.predicate(false)).toBe(true)
+    expect(result.predicate('test')).toBe(false)
+    expect(result.predicate(false)).toBe(false)
   })
 
   it('should properly prepare a predicate with plain parameters', () => {
@@ -119,11 +119,6 @@ describe('validator collection', () => {
 
     expect(validations).toHaveProperty('test')
 
-    console.log(validations)
-
-    console.log(validations.test(true))
-    console.log(validations.test(false))
-
     expect(validations.test(false).error).toHaveLength(0)
     expect(validations.test(false).warn).toHaveLength(0)
     expect(validations.test(false).info).toHaveLength(0)
@@ -164,19 +159,18 @@ describe('validator collection', () => {
     const validations = collectValidators(resolved)
 
     expect(validations).toHaveProperty('test')
-    // expect(validations.test.error).toHaveLength(1)
-    // expect(validations.test.warn).toHaveLength(0)
-    // expect(validations.test.info).toHaveLength(0)
-    // expect(validations.test.success).toHaveLength(0)
 
-    // expect(validations.test.error[0]).toMatchObject({
-    //   message: 'always error',
-    //   level: 'error',
-    //   type: 'always'
-    // })
-    // expect(validations.test.error[0]).toHaveProperty('predicate')
-    // expect(validations.test.error[0].predicate(true)).toBe(true)
-    // expect(validations.test.error[0].predicate(false)).toBe(true)
+    expect(validations.test(false).error).toHaveLength(0)
+    expect(validations.test(false).warn).toHaveLength(0)
+    expect(validations.test(false).info).toHaveLength(0)
+    expect(validations.test(false).success).toHaveLength(0)
+
+    expect(validations.test(true).error).toHaveLength(1)
+    expect(validations.test(true).warn).toHaveLength(0)
+    expect(validations.test(true).info).toHaveLength(0)
+    expect(validations.test(true).success).toHaveLength(0)
+
+    expect(validations.test(true).error[0]).toEqual('always error')
   })
 
   it('should collect nothing if no validations were specified', () => {
@@ -292,18 +286,16 @@ describe('validator collection', () => {
     const validations = collectValidators(resolved)
 
     expect(validations).toHaveProperty('other')
-    // expect(validations.other.error).toHaveLength(1)
-    // expect(validations.other.warn).toHaveLength(0)
-    // expect(validations.other.info).toHaveLength(0)
-    // expect(validations.other.success).toHaveLength(0)
+    expect(validations.other(false).error).toHaveLength(0)
+    expect(validations.other(false).warn).toHaveLength(0)
+    expect(validations.other(false).info).toHaveLength(0)
+    expect(validations.other(false).success).toHaveLength(0)
 
-    // expect(validations.other.error[0]).toMatchObject({
-    //   message: 'error',
-    //   level: 'error',
-    //   type: 'always'
-    // })
-    // expect(validations.other.error[0]).toHaveProperty('predicate')
-    // expect(validations.other.error[0].predicate(true)).toBe(true)
-    // expect(validations.other.error[0].predicate(false)).toBe(true)
+    expect(validations.other(true).error).toHaveLength(1)
+    expect(validations.other(true).warn).toHaveLength(0)
+    expect(validations.other(true).info).toHaveLength(0)
+    expect(validations.other(true).success).toHaveLength(0)
+
+    expect(validations.other(true).error[0]).toEqual('error')
   })
 })

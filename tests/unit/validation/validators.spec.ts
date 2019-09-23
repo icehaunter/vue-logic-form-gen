@@ -2,10 +2,10 @@ import { validators } from '@/components/form-generator/validation/validators'
 
 describe('all possible validators', () => {
   describe('validator: always', () => {
-    it('should always be true', () => {
-      expect(validators.always()(true)).toBe(true)
-      expect(validators.always()(false)).toBe(true)
-      expect(validators.always()(undefined)).toBe(true)
+    it('should always be false', () => {
+      expect(validators.always()(true)).toBe(false)
+      expect(validators.always()(false)).toBe(false)
+      expect(validators.always()(undefined)).toBe(false)
     })
   })
   describe('validator: required', () => {
