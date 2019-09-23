@@ -43,6 +43,14 @@ class WidgetRegistry {
   list () {
     return Object.keys(this.bindings)
   }
+
+  unregister (name: string) {
+    if (this.bindings[name as keyof WidgetParams] !== undefined) {
+      delete this.bindings[name as keyof WidgetParams]
+    } else {
+      throw new Error(`Widget with name "${name}" is not available`)
+    }
+  }
 }
 
 // type ResolvedParams<K, T> = T extends object ? ({} extends T ? { type: K } : { type: K, params: T }): { type: K }
