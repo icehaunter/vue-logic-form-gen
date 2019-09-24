@@ -2,27 +2,29 @@
   <div ref="root">
     <layout-builder :tree="resolvedSchema">
       <template v-slot:field="field">
-        <!-- <pre style="text-align: left">{{ field }}</pre> -->
-        <component :is="lookup(field.widget.type)" v-bind="field.widget.params" />
+        <widget-renderer
+          :field="field"
+          :validations="errorObject[field.modelPath]"
+          :value="getByPath(field.modelPath)"
+          @valueChanged="doUpdate"
+        />
       </template>
     </layout-builder>
-    <pre style="text-align: left">{{ resolvedSchema }}</pre>
-    <pre style="text-align: left">{{ errorObject }}</pre>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue, { PropType } from 'vue'
 import LayoutBuilder from './layout/LayoutBuilder'
+import WidgetRenderer from './layout/WidgetRenderer'
 import { LogicalBranch } from './schema/types'
 import { prepareBranch, resolveTree } from './resolution'
 import { Prepared } from './resolution/types'
 import { ResolutionResult } from './resolution/resolution'
 import { registry } from './widgets'
-import './widgets/basicWidgets/heading'
-import './widgets/basicWidgets/paragraph'
 import { ValidatorLevel } from './validation/types'
-import { collectValidators, CollectedValidators } from './validation'
+import { collectValidators, CollectedValidators, getValidity } from './validation'
+import { getByPath } from '../../utils/objectTraversal'
 
 type ValidationResults = {
   [k: string]: {
@@ -39,6 +41,14 @@ export default Vue.extend({
     model: {
       type: Object,
       required: true
+    },
+    errorLevels: {
+      type: Array as PropType<ValidatorLevel[]>,
+      required: false,
+      default: () => ['error'] as ValidatorLevel[],
+      validator: (val): boolean => {
+        return val.every((v) => (['error', 'warn', 'info', 'success'] as ValidatorLevel[]).includes(v))
+      }
     }
   },
   data () {
@@ -46,10 +56,32 @@ export default Vue.extend({
       touched: {} as { [k: string]: boolean }
     }
   },
-  components: { LayoutBuilder },
+  components: { LayoutBuilder, WidgetRenderer },
   methods: {
+    validateAll () {
+      for (const key of Object.keys(this.collectedValidators)) {
+        this.touched[key] = true
+      }
+    },
     lookup (key: string) {
       return registry.lookup(key).component
+    },
+    getByPath (path: string) {
+      return getByPath(this.model, path)
+    },
+    doUpdate ({ path, value }: { path: string; value: any }) {
+      console.log('update', path, value)
+      this.touched[path] = true
+      this.$emit('update', {
+        path,
+        value
+      })
+
+      const splitPath = path.split('.')
+
+      const lhs = getByPath<any>(this.model, splitPath.slice(0, -1))
+      const accessor = splitPath[splitPath.length - 1]
+      lhs[accessor] = value
     }
   },
   computed: {
@@ -73,10 +105,16 @@ export default Vue.extend({
       return collectValidators(this.resolvedSchema)
     },
     errorObject (): ValidationResults {
-      return Object.keys(this.collectedValidators).reduce((agg, key) => {
-        agg[key] = this.collectedValidators[key](this.touched[key] || false)
-        return agg
-      }, {} as ValidationResults)
+      return Object.keys(this.collectedValidators).reduce(
+        (agg, key) => {
+          agg[key] = this.collectedValidators[key](this.touched[key] || false)
+          return agg
+        },
+        {} as ValidationResults
+      )
+    },
+    validated (): { allValid: boolean; valid: number; total: number } {
+      return getValidity(this.collectedValidators, this.errorLevels)
     }
   },
   mounted () {
@@ -86,5 +124,4 @@ export default Vue.extend({
 </script>
 
 <style>
-
 </style>
