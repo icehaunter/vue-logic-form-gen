@@ -41,7 +41,7 @@ function _collectValidators (resolved: ResolutionResult): Array<ModelValidators>
     return resolved.flatMap(_collectValidators)
   } else if (resolved.type === 'level') {
     return resolved.children.flatMap(_collectValidators)
-  } else if (resolved.validation !== undefined) {
+  } else if (resolved.validation !== undefined && resolved.modelPath !== undefined) {
     return [[resolved.modelPath, resolved.validation]]
   } else {
     return []
@@ -58,10 +58,10 @@ export type CollectedValidators = { [k: string]: ValidationCurriedApplier }
 
 // function groupValidators (agg: { [k: string]: PreparedValidator[] }, [path, validators]: [string, PreparedValidator[]]): {}
 
-const buildValidationApplier = (validators: PreparedValidator[]): ValidationApplier => (value) => (dirty) => {
-  return validators.reduce((result, validator) => {
-    if ((validator.runOnEmpty || dirty) && !validator.predicate(value)) {
-      result[validator.level].push(validator.message)
+const buildValidationApplier = (validators: PreparedValidator[]): ValidationApplier => (value) => {
+  const prepared = validators.reduce((result, validator) => {
+    if (!validator.predicate(value)) {
+      result[validator.level].push([Boolean(validator.runOnEmpty), validator.message])
     }
     return result
   }, {
@@ -69,7 +69,14 @@ const buildValidationApplier = (validators: PreparedValidator[]): ValidationAppl
     info: [],
     success: [],
     warn: []
-  } as ValidationResult)
+  } as { [k in ValidatorLevel]: Array<[boolean, string]> })
+
+  return (dirty) => ({
+    error: prepared.error.filter(v => v[0] || dirty).map(v => v[1]),
+    warn: prepared.warn.filter(v => v[0] || dirty).map(v => v[1]),
+    info: prepared.info.filter(v => v[0] || dirty).map(v => v[1]),
+    success: prepared.success.filter(v => v[0] || dirty).map(v => v[1])
+  })
 }
 
 export function prepareAppliedValidator (validators: ValidatorsSchema[], model: any, context: Context) {
@@ -92,4 +99,17 @@ export function collectValidators (resolved: ResolutionResult): CollectedValidat
     agg[key] = (dirty: boolean) => grouped[key].map(a => a(dirty)).reduce(mergeValidationResults)
     return agg
   }, {} as CollectedValidators)
+}
+
+export function getValidity (validators: CollectedValidators, levels: ValidatorLevel[] = ['error']) {
+  return Object.values(validators).reduce((agg, applier) => {
+    const applied = applier(true)
+    const hasNoMessages = levels.flatMap(l => applied[l]).length === 0
+
+    agg.total += 1
+    agg.valid += hasNoMessages ? 1 : 0
+    agg.allValid = agg.allValid && hasNoMessages
+
+    return agg
+  }, { total: 0, valid: 0, allValid: true })
 }

@@ -1,4 +1,4 @@
-import { prepareValidator, collectValidators, PreparedValidator } from '@/components/form-generator/validation'
+import { prepareValidator, collectValidators, PreparedValidator, getValidity } from '@/components/form-generator/validation'
 import { prepareBranch, resolveTree } from '@/components/form-generator/resolution'
 
 describe('validator preparation', () => {
@@ -340,5 +340,29 @@ describe('validator collection', () => {
     expect(validations.other(true).success).toHaveLength(0)
 
     expect(validations.other(true).error[0]).toEqual('error')
+  })
+})
+
+describe('validity test', () => {
+  it('should count error messages for "error" level by default', () => {
+    const result = getValidity({
+      'a': () => ({
+        error: ['error'],
+        warn: ['warn'],
+        info: ['info'],
+        success: ['success']
+      }),
+
+      'b': () => ({
+        error: [],
+        warn: [],
+        info: [],
+        success: []
+      })
+    })
+
+    expect(result.valid).toEqual(1)
+    expect(result.total).toEqual(2)
+    expect(result.allValid).toBe(false)
   })
 })

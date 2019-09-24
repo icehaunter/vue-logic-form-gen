@@ -1,4 +1,5 @@
 import { WrapValueObject, Value } from '../logic/value'
+import { ValidatorLevel } from '../validation/types'
 
 export interface WidgetParams {}
 
@@ -11,3 +12,11 @@ type ParamsToSchema<T> = Values<{
 }>
 
 export type WidgetSchema = ParamsToSchema<WidgetParams>
+
+export interface BaseProps {
+  _validations: { [k in ValidatorLevel]: string[] }
+  errorMessage: string | undefined
+  warnMessage: string | undefined
+  successMessage: string | undefined
+  infoMessage: string | undefined
+}

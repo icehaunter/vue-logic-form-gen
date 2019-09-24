@@ -6,10 +6,19 @@ import { resolveValue } from '../logic'
 import { Context } from '../resolution'
 
 interface WidgetBinding {
-  component: VueConstructor<Vue>
-  | FunctionalComponentOptions<any, PropsDefinition<any>>
-  | ComponentOptions<never, any, any, any, any, Record<string, any>>
+  component:
+    | VueConstructor<Vue>
+    | FunctionalComponentOptions<any, PropsDefinition<any>>
+    | ComponentOptions<never, any, any, any, any, Record<string, any>>
   options?: Record<string, any>
+  valueProp: string
+  eventName: string
+}
+
+interface RegisterOptions {
+  valueProp?: string
+  eventName?: string
+  force?: boolean
 }
 
 class WidgetRegistry {
@@ -19,15 +28,27 @@ class WidgetRegistry {
     this.bindings = {}
   }
 
-  register (name: keyof WidgetParams, component: WidgetBinding['component'], options?: WidgetBinding['options'], force: boolean = false) {
-    if (force) {
-      this.bindings[name] = { component, options: options }
-    } else {
-      if (name in this.bindings) {
-        throw new Error('Widget with this name already registered. Use "force" if you want to overwrite the provided widget.')
-      } else {
-        this.bindings[name] = { component, options: options }
+  register (
+    name: keyof WidgetParams,
+    component: WidgetBinding['component'],
+    componentOptions?: WidgetBinding['options'],
+    {
+      valueProp = 'value',
+      eventName = 'input',
+      force = false
+    }: RegisterOptions = {}
+  ) {
+    if (force || !(name in this.bindings)) {
+      this.bindings[name] = {
+        component,
+        options: componentOptions,
+        eventName: eventName,
+        valueProp: valueProp
       }
+    } else {
+      throw new Error(
+        'Widget with this name already registered. Use "force" if you want to overwrite the provided widget.'
+      )
     }
   }
 
@@ -55,9 +76,13 @@ class WidgetRegistry {
 
 // type ResolvedParams<K, T> = T extends object ? ({} extends T ? { type: K } : { type: K, params: T }): { type: K }
 
-export type PreparedWidget = { type: string, params?: { [k: string]: any }}
+export type PreparedWidget = { type: string; params?: { [k: string]: any } }
 
-export function prepareWidget (widget: { type: string, params?: { [k: string]: Value<any> }}, model: any, context: Context): PreparedWidget {
+export function prepareWidget (
+  widget: { type: string; params?: { [k: string]: Value<any> } },
+  model: any,
+  context: Context
+): PreparedWidget {
   if (widget.params !== undefined) {
     let preparedParams: any = {}
     for (const [key, value] of Object.entries(widget.params)) {

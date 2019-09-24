@@ -197,20 +197,25 @@ function prepareField (field: Field): Prepared.Field {
   return {
     _tag: 'field',
     resolver: memoize((model, context) => {
+      /* Widget */
       const preparedWidget = prepareWidget(field.widget, model, context)
-      const appliedValidator = field.validation && prepareAppliedValidator(field.validation, model, context)
-      const preparedValidations = appliedValidator && memoize((model: any, context: Context) => {
-        const value = resolveModelPath(field.modelPath, model, context)
+      const preparedClassList = field.classList && field.classList.map((val) => resolveValue(val, model, context))
+
+      /* Model */
+      const resolvedModelPath = field.modelPath !== undefined ? resolveContextPath(field.modelPath, context).join('.') : undefined
+      const appliedValidator = (resolvedModelPath && field.validation) ? prepareAppliedValidator(field.validation, model, context) : undefined
+
+      const preparedValidations = !(field.modelPath && appliedValidator) ? undefined : memoize((model: any, context: Context) => {
+        const value = resolveModelPath(field.modelPath!, model, context)
         return appliedValidator(value)
       })
-      const preparedClassList = field.classList && field.classList.map((val) => resolveValue(val, model, context))
 
       return {
         ...field,
         widget: preparedWidget,
         classList: preparedClassList,
         validation: preparedValidations,
-        modelPath: resolveContextPath(field.modelPath, context).join('.')
+        modelPath: field.modelPath && resolveContextPath(field.modelPath, context).join('.')
       }
     })
   }
