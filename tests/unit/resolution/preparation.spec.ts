@@ -117,10 +117,72 @@ describe('prepareBranch', () => {
       })
     })
 
-    it('should prepare validations', () => {
+    it('should prepare appliable validations', () => {
       const prepared = prepareBranch({
         type: 'field',
         modelPath: 'value',
+        widget: {
+          type: 'span'
+        },
+        validation: [
+          {
+            type: 'minLength',
+            message: 'test',
+            level: 'error',
+            params: { min: { _modelPath: 'min' } }
+          },
+          {
+            type: 'maxLength',
+            message: 'test',
+            level: 'error',
+            params: { max: 10 }
+          },
+          {
+            type: 'always',
+            message: 'test',
+            level: 'warn'
+          },
+          {
+            type: 'always',
+            message: 'test',
+            level: 'info'
+          },
+          {
+            type: 'always',
+            message: 'test',
+            level: 'success'
+          }
+        ]
+      }) as Prepared.Field
+
+      expect(prepared._tag).toBe('field')
+
+      const resolved = prepared.resolver({ min: 2 }, [
+        {
+          index: 2,
+          splitPoint: 'value'
+        }
+      ])
+
+      expect(resolved).toHaveProperty('type', 'field')
+      expect(resolved).toHaveProperty('modelPath', 'value')
+      expect(resolved).toHaveProperty('validation')
+
+      expect(resolved.validation).toBeDefined()
+
+      const result = resolved.validation!({ value: 'a' }, [])(true)
+      expect(result.info).toHaveLength(1)
+      expect(result.warn).toHaveLength(1)
+      expect(result.success).toHaveLength(1)
+      expect(result.error).toHaveLength(1)
+
+      expect(result.error[0]).toEqual('test')
+    })
+
+    it('should not prepare validations if modelPath is undefined', () => {
+      const prepared = prepareBranch({
+        type: 'field',
+        modelPath: undefined,
         widget: {
           type: 'span'
         },
@@ -144,18 +206,10 @@ describe('prepareBranch', () => {
       ])
 
       expect(resolved).toHaveProperty('type', 'field')
-      expect(resolved).toHaveProperty('modelPath', 'value')
+      expect(resolved).toHaveProperty('modelPath', undefined)
       expect(resolved).toHaveProperty('validation')
 
-      expect(resolved.validation).toBeDefined()
-
-      const result = resolved.validation!({ value: 'a' }, [])(true)
-      expect(result.info).toHaveLength(0)
-      expect(result.warn).toHaveLength(0)
-      expect(result.success).toHaveLength(0)
-      expect(result.error).toHaveLength(1)
-
-      expect(result.error[0]).toEqual('test')
+      expect(resolved.validation).toBeUndefined()
     })
   })
 
