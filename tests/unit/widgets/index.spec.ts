@@ -6,7 +6,9 @@ describe('widget registry', () => {
 
     expect(registry.lookup('span')).toEqual({
       component: {},
-      options: undefined
+      options: undefined,
+      eventName: 'input',
+      valueProp: 'value'
     })
     expect(registry.list()).toEqual(['span'])
 
@@ -18,7 +20,9 @@ describe('widget registry', () => {
 
     expect(registry.lookup('span')).toEqual({
       component: {},
-      options: { type: 'a' }
+      options: { type: 'a' },
+      eventName: 'input',
+      valueProp: 'value'
     })
     expect(registry.list()).toEqual(['span'])
     registry.unregister('span')
@@ -34,7 +38,7 @@ describe('widget registry', () => {
   it('should reregister a widget if forced', () => {
     registry.register('span', {})
 
-    expect(() => registry.register('span', {}, undefined, true)).not.toThrowError()
+    expect(() => registry.register('span', {}, undefined, { force: true })).not.toThrowError()
     registry.unregister('span')
   })
 
