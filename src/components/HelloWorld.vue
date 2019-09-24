@@ -10,6 +10,8 @@
 import Vue from 'vue'
 import Generator from './form-generator/Generator.vue'
 import { LogicalBranch } from './form-generator/schema/types'
+import './form-generator/widgets/basicWidgets/paragraph'
+import './form-generator/widgets/basicWidgets/input'
 
 interface IData {
   model: any,
@@ -28,6 +30,7 @@ export default Vue.extend({
             text: 'whatever'
           }
         },
+        inputType: 'text',
         value: true
       },
       schema: {
@@ -37,12 +40,12 @@ export default Vue.extend({
         },
         then: {
           type: 'field',
-          modelPath: 'deeply.nested.value',
+          modelPath: 'deeply.nested.text',
           widget: {
-            type: 'paragraph',
+            type: 'basicInput',
             params: {
-              text: {
-                _modelPath: 'deeply.nested.text'
+              type: {
+                _modelPath: 'inputType'
               }
             }
           },
@@ -50,16 +53,11 @@ export default Vue.extend({
             {
               type: 'required',
               message: 'Value should not be "false"',
-              level: 'warn',
+              level: 'error',
               runOnEmpty: true
             },
-            { type: 'isTrue', message: 'should be true', level: 'info', runOnEmpty: true }
+            { type: 'isTrue', message: 'should be true', level: 'info' }
           ]
-        },
-        else: {
-          type: 'level',
-          level: 'else',
-          children: []
         }
       }
     }
