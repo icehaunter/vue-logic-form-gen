@@ -100,3 +100,16 @@ export function collectValidators (resolved: ResolutionResult): CollectedValidat
     return agg
   }, {} as CollectedValidators)
 }
+
+export function getValidity (validators: CollectedValidators, levels: ValidatorLevel[] = ['error']) {
+  return Object.values(validators).reduce((agg, applier) => {
+    const applied = applier(true)
+    const hasNoMessages = levels.flatMap(l => applied[l]).length === 0
+
+    agg.total += 1
+    agg.valid += hasNoMessages ? 1 : 0
+    agg.allValid = agg.allValid && hasNoMessages
+
+    return agg
+  }, { total: 0, valid: 0, allValid: true })
+}
