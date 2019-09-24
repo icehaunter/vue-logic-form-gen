@@ -49,6 +49,11 @@ export default Vue.extend({
       validator: (val): boolean => {
         return val.every((v) => (['error', 'warn', 'info', 'success'] as ValidatorLevel[]).includes(v))
       }
+    },
+    noUpdate: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -77,11 +82,13 @@ export default Vue.extend({
         value
       })
 
-      const splitPath = path.split('.')
+      if (!this.noUpdate) {
+        const splitPath = path.split('.')
 
-      const lhs = getByPath<any>(this.model, splitPath.slice(0, -1))
-      const accessor = splitPath[splitPath.length - 1]
-      lhs[accessor] = value
+        const lhs = getByPath<any>(this.model, splitPath.slice(0, -1))
+        const accessor = splitPath[splitPath.length - 1]
+        lhs[accessor] = value
+      }
     }
   },
   computed: {
