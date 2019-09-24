@@ -58,10 +58,10 @@ export type CollectedValidators = { [k: string]: ValidationCurriedApplier }
 
 // function groupValidators (agg: { [k: string]: PreparedValidator[] }, [path, validators]: [string, PreparedValidator[]]): {}
 
-const buildValidationApplier = (validators: PreparedValidator[]): ValidationApplier => (value) => (dirty) => {
-  return validators.reduce((result, validator) => {
-    if ((validator.runOnEmpty || dirty) && !validator.predicate(value)) {
-      result[validator.level].push(validator.message)
+const buildValidationApplier = (validators: PreparedValidator[]): ValidationApplier => (value) => {
+  const prepared = validators.reduce((result, validator) => {
+    if (!validator.predicate(value)) {
+      result[validator.level].push([Boolean(validator.runOnEmpty), validator.message])
     }
     return result
   }, {
@@ -69,7 +69,14 @@ const buildValidationApplier = (validators: PreparedValidator[]): ValidationAppl
     info: [],
     success: [],
     warn: []
-  } as ValidationResult)
+  } as { [k in ValidatorLevel]: Array<[boolean, string]> })
+
+  return (dirty) => ({
+    error: prepared.error.filter(v => v[0] || dirty).map(v => v[1]),
+    warn: prepared.warn.filter(v => v[0] || dirty).map(v => v[1]),
+    info: prepared.info.filter(v => v[0] || dirty).map(v => v[1]),
+    success: prepared.success.filter(v => v[0] || dirty).map(v => v[1])
+  })
 }
 
 export function prepareAppliedValidator (validators: ValidatorsSchema[], model: any, context: Context) {
