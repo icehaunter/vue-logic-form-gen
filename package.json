@@ -1,6 +1,6 @@
 {
   "name": "vue-logic-form-gen",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "email": "icehaunter@gmail.com",
     "name": "Ilya Borovitinov",
@@ -13,7 +13,7 @@
     "test:unit": "vue-cli-service test:unit",
     "test:stryker": "cross-env VUE_CLI_BABEL_TARGET_NODE=true VUE_CLI_BABEL_TRANSPILE_MODULES=true stryker run",
     "format": "pretty-quick --pattern \"**/*.(ts|js|vue)\" --ignore-path .gitignore && vue-cli-service lint",
-    "build-library": "vue-cli-service build --target lib --name vue-logic-form-gen ./src/form-generator/Generator.vue"
+    "build-library": "vue-cli-service build --target lib --name vue-logic-form-gen ./src/entry.ts"
   },
   "main": "./dist/vue-logic-form-gen.common.js",
   "files": [

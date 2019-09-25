@@ -1,14 +1,14 @@
-import { registry } from '../../widgets'
+import { registry } from '../../form-generator/widgets'
 import Vue from 'vue'
-import { BaseProps } from '../types'
-import { ValidatorLevel } from '../../validation/types'
+import { BaseProps } from '../../form-generator/widgets/types'
+import { ValidatorLevel } from '../../form-generator/validation/types'
 
 interface InputParams {
   required?: true
   type: 'text' | 'email' | 'number' | 'tel'
 }
 
-declare module '../types' {
+declare module '../../form-generator/widgets/types' {
   interface WidgetParams {
     basicInput: InputParams
   }

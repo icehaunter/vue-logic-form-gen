@@ -1,5 +1,5 @@
-import '../types'
-import { registry } from '../../widgets'
+import '../../form-generator/widgets/types'
+import { registry } from '../../form-generator/widgets'
 import Vue from 'vue'
 
 interface HeadingParams {
@@ -7,7 +7,7 @@ interface HeadingParams {
   text: string
 }
 
-declare module '../types' {
+declare module '../../form-generator/widgets/types' {
   interface WidgetParams {
     heading: HeadingParams
   }
