@@ -24,7 +24,7 @@ import { ResolutionResult } from './resolution/resolution'
 import { registry } from './widgets'
 import { ValidatorLevel } from './validation/types'
 import { collectValidators, CollectedValidators, getValidity } from './validation'
-import { getByPath } from '../../utils/objectTraversal'
+import { getByPath } from './utils/objectTraversal'
 
 type ValidationResults = {
   [k: string]: {
@@ -75,7 +75,6 @@ export default Vue.extend({
       return getByPath(this.model, path)
     },
     doUpdate ({ path, value }: { path: string; value: any }) {
-      console.log('update', path, value)
       this.touched[path] = true
       this.$emit('update', {
         path,
@@ -123,9 +122,6 @@ export default Vue.extend({
     validated (): { allValid: boolean; valid: number; total: number } {
       return getValidity(this.collectedValidators, this.errorLevels)
     }
-  },
-  mounted () {
-    console.log(registry.list())
   }
 })
 </script>

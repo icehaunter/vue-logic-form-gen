@@ -8,10 +8,10 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Generator from './form-generator/Generator.vue'
-import { LogicalBranch } from './form-generator/schema/types'
-import './form-generator/widgets/basicWidgets/paragraph'
-import './form-generator/widgets/basicWidgets/input'
+import Generator from '../form-generator/Generator.vue'
+import { LogicalBranch } from '../form-generator/schema/types'
+import '../form-generator/widgets/basicWidgets/paragraph'
+import '../form-generator/widgets/basicWidgets/input'
 
 interface IData {
   model: any,
