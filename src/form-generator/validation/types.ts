@@ -14,7 +14,7 @@ export type BuildValidators<T extends ValidatorParams> = {
 
 type Values<T> = T[keyof T]
 
-interface Validator<K> {
+export interface Validator<K> {
   /**
    * Type of the validator. Inferred from available validators.
    * Implicitly defines needed parameters
@@ -35,7 +35,7 @@ interface Validator<K> {
   runOnEmpty?: boolean
 }
 
-interface ValidatorWithParams<K, P extends object> extends Validator<K> {
+export interface ValidatorWithParams<K, P extends object> extends Validator<K> {
   /**
    * Parameters for the specified validator
    */
