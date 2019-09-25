@@ -16,6 +16,7 @@
     "build-library": "vue-cli-service build --target lib --name vue-logic-form-gen ./src/entry.ts"
   },
   "main": "./dist/vue-logic-form-gen.common.js",
+  "types": "./dist/entry.d.ts",
   "files": [
     "dist/*",
     "src/*",
