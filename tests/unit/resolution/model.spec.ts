@@ -1,4 +1,4 @@
-import { resolveModelPath } from '@/components/form-generator/resolution'
+import { resolveModelPath } from '@/form-generator/resolution'
 
 describe('resolveModelPath', () => {
   it('should return a basic value based on the path', () => {

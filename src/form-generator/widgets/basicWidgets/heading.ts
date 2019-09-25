@@ -1,5 +1,5 @@
 import '../types'
-import { registry } from '..'
+import { registry } from '../../widgets'
 import Vue from 'vue'
 
 interface HeadingParams {

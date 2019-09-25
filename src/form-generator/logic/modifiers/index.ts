@@ -7,7 +7,7 @@ import { NumberModifierTypes, modifiers as numberModifiers } from './type/number
 import { ArrayModifierTypes, modifiers as arrayModifiers } from './type/array'
 import { ObjectModifierTypes, modifiers as objectModifiers } from './type/object'
 import { Context } from '../../resolution'
-import { resolveValue } from '..'
+import { resolveValue } from '../../logic'
 import { Value, UnwrapValueArray } from '../value'
 import { ModifierValueUndefinedError } from '../errors'
 

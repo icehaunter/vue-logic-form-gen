@@ -1,5 +1,5 @@
-import { prepareValidator, collectValidators, PreparedValidator, getValidity } from '@/components/form-generator/validation'
-import { prepareBranch, resolveTree } from '@/components/form-generator/resolution'
+import { prepareValidator, collectValidators, PreparedValidator, getValidity } from '@/form-generator/validation'
+import { prepareBranch, resolveTree } from '@/form-generator/resolution'
 
 describe('validator preparation', () => {
   it('should properly prepare a simple validator', () => {

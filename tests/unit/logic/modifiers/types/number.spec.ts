@@ -1,4 +1,4 @@
-import { modifiers } from '@/components/form-generator/logic/modifiers/type/number'
+import { modifiers } from '@/form-generator/logic/modifiers/type/number'
 
 describe('Modifier actions for number type', () => {
   it('should have a add-operator', () => {

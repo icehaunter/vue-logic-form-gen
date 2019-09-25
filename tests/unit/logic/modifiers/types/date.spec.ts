@@ -1,4 +1,4 @@
-import { modifiers } from '@/components/form-generator/logic/modifiers/type/date'
+import { modifiers } from '@/form-generator/logic/modifiers/type/date'
 
 describe('Modifier actions for date type', () => {
   it('should have an isAfter-operator', () => {

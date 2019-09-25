@@ -1,4 +1,4 @@
-import { modifiers } from '@/components/form-generator/logic/modifiers/type/object'
+import { modifiers } from '@/form-generator/logic/modifiers/type/object'
 
 describe('Modifier actions for object type', () => {
   it('should have a get-operator', () => {

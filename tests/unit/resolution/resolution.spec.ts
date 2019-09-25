@@ -1,9 +1,9 @@
 import {
   prepareBranch,
   resolveTree
-} from '@/components/form-generator/resolution'
-import { ResolutionResult } from '@/components/form-generator/resolution/resolution'
-import { Resolved } from '@/components/form-generator/resolution/types'
+} from '@/form-generator/resolution'
+import { ResolutionResult } from '@/form-generator/resolution/resolution'
+import { Resolved } from '@/form-generator/resolution/types'
 
 describe('resolveTree', () => {
   it('should build a real tree based on the simple prepared one', () => {

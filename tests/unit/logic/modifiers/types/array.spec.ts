@@ -1,4 +1,4 @@
-import { modifiers } from '@/components/form-generator/logic/modifiers/type/array'
+import { modifiers } from '@/form-generator/logic/modifiers/type/array'
 
 describe('Modifier actions for array type', () => {
   it('should have a join-operator', () => {

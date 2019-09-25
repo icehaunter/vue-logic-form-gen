@@ -1,4 +1,4 @@
-import { validators } from '@/components/form-generator/validation/validators'
+import { validators } from '@/form-generator/validation/validators'
 
 describe('all possible validators', () => {
   describe('validator: always', () => {

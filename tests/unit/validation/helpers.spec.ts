@@ -1,4 +1,4 @@
-import { req, len, regex } from '@/components/form-generator/validation/helpers'
+import { req, len, regex } from '@/form-generator/validation/helpers'
 
 describe('required helper', () => {
   it('should properly check if value is present for any type', () => {

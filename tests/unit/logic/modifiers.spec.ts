@@ -1,8 +1,8 @@
 import {
   ModifierChain,
   resolveModifierChain
-} from '@/components/form-generator/logic/modifiers'
-import { ValueUndefinedError } from '@/components/form-generator/logic/errors'
+} from '@/form-generator/logic/modifiers'
+import { ValueUndefinedError } from '@/form-generator/logic/errors'
 
 describe('Modifier chain resolution', () => {
   it('should resolve a basic modifier chain from one link', () => {

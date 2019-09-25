@@ -1,4 +1,4 @@
-import { modifiers } from '@/components/form-generator/logic/modifiers/type/boolean'
+import { modifiers } from '@/form-generator/logic/modifiers/type/boolean'
 
 describe('Modifier actions for boolean type', () => {
   it('should have a not-operator', () => {

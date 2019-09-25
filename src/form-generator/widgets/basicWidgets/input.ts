@@ -1,4 +1,4 @@
-import { registry } from '..'
+import { registry } from '../../widgets'
 import Vue from 'vue'
 import { BaseProps } from '../types'
 import { ValidatorLevel } from '../../validation/types'
