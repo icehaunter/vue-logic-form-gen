@@ -1,5 +1,5 @@
 import { Context } from './types'
-import { getByPath } from '@/utils/objectTraversal'
+import { getByPath } from '../utils/objectTraversal'
 
 /**
  * Get a path within the model with all the `$each` parts resolved based on the context

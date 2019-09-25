@@ -2,7 +2,7 @@ import { BuildValidators, BuildValidatorSchema } from './types'
 import { req, regex, len } from './helpers'
 import { isAfter, isValid, isBefore } from 'date-fns'
 import { DateLike, getDate } from '../utils/date'
-import { getByPath } from '@/utils/objectTraversal'
+import { getByPath } from '../utils/objectTraversal'
 
 export type ValidatorParamTypes = {
   always: undefined

@@ -1,4 +1,4 @@
-import { getByPath } from '@/utils/objectTraversal'
+import { getByPath } from '@/form-generator/utils/objectTraversal'
 
 describe('Test getting object property by path', () => {
   it('should get a basic property at object root', () => {

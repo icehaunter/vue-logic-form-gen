@@ -3,7 +3,7 @@ import { resolveValue } from '../logic'
 import { Context } from '../resolution'
 import { ResolutionResult } from '../resolution/resolution'
 import { ValidatorLevel } from './types'
-import { groupByKey } from '@/utils/arrayTraversal'
+import { groupByKey } from '../utils/arrayTraversal'
 
 export interface PreparedValidator extends Omit<ValidatorsSchema, 'params'> {
   predicate: (value: any) => boolean

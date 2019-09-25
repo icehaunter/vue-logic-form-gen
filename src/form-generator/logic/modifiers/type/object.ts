@@ -1,4 +1,4 @@
-import { getByPath } from '@/utils/objectTraversal'
+import { getByPath } from '../../../utils/objectTraversal'
 
 export type ObjectModifierTypes = {
   keys: (obj: object) => Array<string>,
