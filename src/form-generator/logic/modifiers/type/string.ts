@@ -1,3 +1,5 @@
+import { parseISO } from 'date-fns'
+
 export type StringModifierTypes = {
   join: (left: string, right: string) => string
   lowercase: (target: string) => string
@@ -10,6 +12,7 @@ export type StringModifierTypes = {
   isEqual: (target: string, equal: string) => boolean
   isSubstring: (target: string, bigger: string) => boolean
   containsSubstring: (target: string, smaller: string) => boolean
+  toDate: (target: string) => Date
 }
 
 export const modifiers: StringModifierTypes = {
@@ -32,5 +35,6 @@ export const modifiers: StringModifierTypes = {
       : new RegExp(regex).test(target),
   isEqual: (target, equal) => target === equal,
   isSubstring: (target, bigger) => bigger.includes(target),
-  containsSubstring: (target, smaller) => target.includes(smaller)
+  containsSubstring: (target, smaller) => target.includes(smaller),
+  toDate: (target) => target === 'now' ? new Date() : parseISO(target)
 }

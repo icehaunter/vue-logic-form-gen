@@ -10,6 +10,7 @@ import { Context } from '../../resolution'
 import { resolveValue } from '../../logic'
 import { Value, UnwrapValueArray } from '../value'
 import { ModifierValueUndefinedError } from '../errors'
+import { getDate } from '../../utils/date'
 
 type BooleanModifiers = BuildModifiers<BooleanModifierTypes>
 type StringModifiers = BuildModifiers<StringModifierTypes>
@@ -53,8 +54,14 @@ const modifierReduce = (model: any, context: Context) => <T extends Modifier> (
     throw new TypeError(`Modifier chain is invalid: expected command for type "${type}", recieved for type "${fromType}" at action #${index}`)
   }
 
+  let preparedValue: any = value
+
+  if (fromType === 'date' && typeof value === 'string') {
+    preparedValue = getDate(value)
+  }
+
   const resolvedArgs = convertValues(args, model, context)
-  const newValue = (modifiers[fromType] as any)[command](value, ...resolvedArgs)
+  const newValue = (modifiers[fromType] as any)[command](preparedValue, ...resolvedArgs)
 
   if (newValue === undefined) {
     throw new ModifierValueUndefinedError(fromType, command, value, resolvedArgs, nextType)

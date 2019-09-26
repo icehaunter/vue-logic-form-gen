@@ -70,4 +70,14 @@ describe('Modifier actions for string type', () => {
     expect(modifiers.testRegex('abc', '^abc$')).toBe(true)
     expect(modifiers.testRegex('abc', 'bbb')).toBe(false)
   })
+
+  it('should convert to date', () => {
+    const day = modifiers.toDate('now')
+    expect(day.getFullYear()).toEqual(new Date().getFullYear())
+
+    const otherDay = modifiers.toDate('2019-01-02')
+    expect(otherDay.getFullYear()).toEqual(2019)
+    expect(otherDay.getDate()).toEqual(2)
+    expect(otherDay.getMonth()).toEqual(0)
+  })
 })

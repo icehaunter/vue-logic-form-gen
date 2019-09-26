@@ -3,6 +3,7 @@ import {
 } from '@/form-generator/logic'
 import { Value } from '@/form-generator/logic/value'
 import { ModifierValueUndefinedError, ModelValueUndefinedError } from '@/form-generator/logic/errors'
+import { isBefore } from 'date-fns'
 
 describe('Value unwrapping', () => {
   describe('Basic types', () => {
@@ -128,6 +129,20 @@ describe('Value unwrapping', () => {
       const result = resolveValue(source, {}, [])
 
       expect(result).toBe(4)
+    })
+
+    it('Should build a date from string, applying the modifiers', () => {
+      const source: Value<Date> = {
+        _buildFrom: 'now',
+        _actions: [
+          ['string', 'toDate', [], 'date'],
+          ['date', 'subtract', [4, 'day'], 'date']
+        ]
+      }
+
+      const result = resolveValue(source, {}, [])
+
+      expect(isBefore(result, new Date())).toBe(true)
     })
 
     it('Should build from a model-sourced value, applying the modifiers', () => {
