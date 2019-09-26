@@ -5,7 +5,7 @@
         <widget-renderer
           :field="field"
           :validations="errorObject[field.modelPath]"
-          :value="getByPath(field.modelPath)"
+          :value="field.modelPath !== undefined ? getByPath(field.modelPath) : undefined"
           @valueChanged="doUpdate"
         />
       </template>

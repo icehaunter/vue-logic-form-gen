@@ -6,7 +6,7 @@ import { ValidatorLevel } from '../validation/types'
 interface IProps {
   field: Resolved.Field,
   validations: { [k in ValidatorLevel]: string[] }
-  value: any
+  value?: any
 }
 
 function callAllListeners (fns: Function | Function[], path: string, value: any) {
@@ -27,7 +27,13 @@ export default Vue.extend<IProps>({
     },
     validations: {
       type: Object as PropType<{ [k in ValidatorLevel]: string[] }>,
-      required: true
+      required: false,
+      default: (): IProps['validations'] => ({
+        error: [],
+        info: [],
+        success: [],
+        warn: []
+      })
     },
     value: {
       required: false
