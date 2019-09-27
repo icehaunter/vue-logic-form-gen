@@ -38,5 +38,6 @@ export const modifiers: StringModifierTypes = {
   isSubstring: (target, bigger) => bigger.includes(target),
   containsSubstring: (target, smaller) => target.includes(smaller),
   toDate: (target) => target === 'now' ? new Date() : parseISO(target),
+  // eslint-disable-next-line
   debug: (target, level, tag) => { console[level](tag, ':', target); return target }
 }

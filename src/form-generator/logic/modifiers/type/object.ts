@@ -11,5 +11,6 @@ export const modifiers: ObjectModifierTypes = {
   keys: (obj) => Object.keys(obj),
   get: (obj, key) => obj[key],
   path: (obj, path) => getByPath(obj, path),
+  // eslint-disable-next-line
   debug: (target, level, tag) => { console[level](tag, ':', target); return target }
 }

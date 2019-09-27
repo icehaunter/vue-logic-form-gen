@@ -7,6 +7,7 @@ export type ArrayModifierTypes = {
 export const modifiers: ArrayModifierTypes = {
   length: (arr) => arr.length,
   at: (arr, index) => arr[index],
+  // eslint-disable-next-line
   debug: (target, level, tag) => { console[level](tag, ':', target); return target }
 
 }

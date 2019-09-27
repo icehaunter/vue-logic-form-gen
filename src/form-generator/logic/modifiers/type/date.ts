@@ -66,5 +66,6 @@ export const modifiers: DateModifierTypes = {
   isBefore: (source, target) => isBefore(source, getDate(target)),
   isAfter: (source, target) => isAfter(source, getDate(target)),
   getFullYear: (source) => source.getFullYear(),
+  // eslint-disable-next-line
   debug: (target, level, tag) => { console[level](tag, ':', target); return target }
 }

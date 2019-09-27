@@ -11,5 +11,6 @@ export const modifiers: BooleanModifierTypes = {
   and: (x, y) => x && y,
   or: (x, y) => x || y,
   xor: (x, y) => x ? !y : y,
+  // eslint-disable-next-line
   debug: (target, level, tag) => { console[level](tag, ':', target); return target }
 }

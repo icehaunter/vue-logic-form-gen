@@ -25,5 +25,6 @@ export const modifiers: NumberModifierTypes = {
   lte: (l, r) => l <= r,
   gt: (l, r) => l > r,
   gte: (l, r) => l >= r,
+  // eslint-disable-next-line
   debug: (target, level, tag) => { console[level](tag, ':', target); return target }
 }
