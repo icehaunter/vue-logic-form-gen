@@ -63,8 +63,8 @@ const modifierReduce = (model: any, context: Context) => <T extends Modifier> (
   const resolvedArgs = convertValues(args, model, context)
   const newValue = (modifiers[fromType] as any)[command](preparedValue, ...resolvedArgs)
 
-  if (newValue === undefined) {
-    throw new ModifierValueUndefinedError(fromType, command, value, resolvedArgs, nextType)
+  if (newValue === undefined || newValue === null) {
+    throw new ModifierValueUndefinedError(fromType, command, value, resolvedArgs, nextType, newValue)
   }
 
   return {

@@ -2,8 +2,11 @@ import { Context, resolveContextPath } from '../resolution'
 import { BasicType } from './types'
 
 export class ValueUndefinedError extends Error {
-  constructor (reason: string, contextMessage: string) {
+  value: null | undefined
+
+  constructor (reason: string, contextMessage: string, value: null | undefined) {
     super(`Value resolution failed: ${reason}; ${contextMessage}`)
+    this.value = value
   }
 }
 
@@ -11,10 +14,11 @@ export class ModelValueUndefinedError extends ValueUndefinedError {
   path: string
   context: Context
 
-  constructor (path: string, context: Context) {
+  constructor (path: string, context: Context, value: null | undefined) {
     super(
       'property on the model is undefined',
-      `resolved path: ${resolveContextPath(path, context)}`
+      `resolved path: ${resolveContextPath(path, context)}`,
+      value
     )
 
     this.path = path
@@ -34,7 +38,8 @@ export class ModifierValueUndefinedError extends ValueUndefinedError {
     command: string,
     value: any,
     resolvedArgs: any[],
-    expectedType: BasicType
+    expectedType: BasicType,
+    realValue: null | undefined
   ) {
     super(
       'modifier chain led to undefined',
@@ -42,7 +47,8 @@ export class ModifierValueUndefinedError extends ValueUndefinedError {
         value
       )}, ...[${resolvedArgs
         .map(v => JSON.stringify(v))
-        .join(', ')}]), expecting ${expectedType}`
+        .join(', ')}]), expecting ${expectedType}`,
+      realValue
     )
     this.fromType = fromType
     this.command = command
