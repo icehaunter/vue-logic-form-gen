@@ -21,7 +21,8 @@ export type DateModifierTypes = {
   subtract: (source: Date, amount: number, step: DateStep) => Date
   difference: (source: Date, target: DateLike, step: DateStep) => number
   isBefore: (source: Date, target: DateLike) => boolean
-  isAfter: (source: Date, target: DateLike) => boolean
+  isAfter: (source: Date, target: DateLike) => boolean,
+  getFullYear: (source: Date) => number
 }
 
 export const modifiers: DateModifierTypes = {
@@ -62,5 +63,6 @@ export const modifiers: DateModifierTypes = {
     }
   },
   isBefore: (source, target) => isBefore(source, getDate(target)),
-  isAfter: (source, target) => isAfter(source, getDate(target))
+  isAfter: (source, target) => isAfter(source, getDate(target)),
+  getFullYear: (source) => source.getFullYear()
 }
