@@ -1,6 +1,6 @@
 {
   "name": "vue-logic-form-gen",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "author": {
     "email": "icehaunter@gmail.com",
     "name": "Ilya Borovitinov",
@@ -14,17 +14,10 @@
     "test:stryker": "cross-env VUE_CLI_BABEL_TARGET_NODE=true VUE_CLI_BABEL_TRANSPILE_MODULES=true stryker run",
     "format": "pretty-quick --pattern \"**/*.(ts|js|vue)\" --ignore-path .gitignore && vue-cli-service lint",
     "build-library": "vue-cli-service build --target lib --name vue-logic-form-gen ./src/form-generator/entry.ts",
-    "prepublishOnly": "vue-cli-service build --target lib --name vue-logic-form-gen ./src/form-generator/entry.ts"
+    "dist": "npm run build-library && cp package.json dist/ && npm publish" 
   },
-  "main": "./dist/vue-logic-form-gen.common.js",
-  "types": "./dist/entry.d.ts",
-  "files": [
-    "dist/*",
-    "src/*",
-    "public/*",
-    "*.json",
-    "*.js"
-  ],
+  "main": "./vue-logic-form-gen.common.js",
+  "types": "./entry.d.ts",
   "dependencies": {
     "core-js": "^2.6.5",
     "date-fns": "^2.1.0",
