@@ -180,8 +180,8 @@ describe('Value unwrapping', () => {
 
       expect(() => resolveValue(source, { value: null }, [])).toThrowError(ModelValueUndefinedError)
       expect(() => resolveValue(source, { value: undefined }, [])).toThrowError(ModelValueUndefinedError)
-      expect(() => resolveValue(source, { value: null }, [], { returnUndefined: true })).toBeNull()
-      expect(() => resolveValue(source, { value: undefined }, [], { returnUndefined: true })).toBeUndefined()
+      expect(resolveValue(source, { value: null }, [], { returnUndefined: true })).toBeNull()
+      expect(resolveValue(source, { value: undefined }, [], { returnUndefined: true })).toBeUndefined()
     })
   })
 })
