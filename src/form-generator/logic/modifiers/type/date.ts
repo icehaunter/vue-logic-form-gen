@@ -23,6 +23,7 @@ export type DateModifierTypes = {
   isBefore: (source: Date, target: DateLike) => boolean
   isAfter: (source: Date, target: DateLike) => boolean,
   getFullYear: (source: Date) => number
+  debug: (target: Date, level: 'debug' | 'log' | 'warn' | 'error', tag: string) => Date
 }
 
 export const modifiers: DateModifierTypes = {
@@ -64,5 +65,6 @@ export const modifiers: DateModifierTypes = {
   },
   isBefore: (source, target) => isBefore(source, getDate(target)),
   isAfter: (source, target) => isAfter(source, getDate(target)),
-  getFullYear: (source) => source.getFullYear()
+  getFullYear: (source) => source.getFullYear(),
+  debug: (target, level, tag) => { console[level](tag, ':', target); return target }
 }

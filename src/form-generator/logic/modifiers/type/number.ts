@@ -10,6 +10,7 @@ export type NumberModifierTypes = {
   lte: (left: number, right: number) => boolean
   gt: (left: number, right: number) => boolean
   gte: (left: number, right: number) => boolean
+  debug: (target: number, level: 'debug' | 'log' | 'warn' | 'error', tag: string) => number
 }
 
 export const modifiers: NumberModifierTypes = {
@@ -23,5 +24,6 @@ export const modifiers: NumberModifierTypes = {
   lt: (l, r) => l < r,
   lte: (l, r) => l <= r,
   gt: (l, r) => l > r,
-  gte: (l, r) => l >= r
+  gte: (l, r) => l >= r,
+  debug: (target, level, tag) => { console[level](tag, ':', target); return target }
 }

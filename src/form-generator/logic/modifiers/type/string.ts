@@ -12,7 +12,8 @@ export type StringModifierTypes = {
   isEqual: (target: string, equal: string) => boolean
   isSubstring: (target: string, bigger: string) => boolean
   containsSubstring: (target: string, smaller: string) => boolean
-  toDate: (target: string) => Date
+  toDate: (target: string) => Date,
+  debug: (target: string, level: 'debug' | 'log' | 'warn' | 'error', tag: string) => string
 }
 
 export const modifiers: StringModifierTypes = {
@@ -36,5 +37,6 @@ export const modifiers: StringModifierTypes = {
   isEqual: (target, equal) => target === equal,
   isSubstring: (target, bigger) => bigger.includes(target),
   containsSubstring: (target, smaller) => target.includes(smaller),
-  toDate: (target) => target === 'now' ? new Date() : parseISO(target)
+  toDate: (target) => target === 'now' ? new Date() : parseISO(target),
+  debug: (target, level, tag) => { console[level](tag, ':', target); return target }
 }
