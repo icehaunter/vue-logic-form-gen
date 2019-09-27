@@ -158,7 +158,7 @@ describe('Value unwrapping', () => {
       expect(result).toBe(4)
     })
 
-    it('Should fail if modifiers return undefined at any point', () => {
+    it('Should fail if modifiers return null or undefined at any point', () => {
       const source: Value<number> = {
         _buildFrom: {
           _modelPath: 'value'
@@ -167,6 +167,21 @@ describe('Value unwrapping', () => {
       }
 
       expect(() => resolveValue(source, { value: { from: 'to' } }, [])).toThrowError(ModifierValueUndefinedError)
+      expect(() => resolveValue(source, { value: { any: null } }, [])).toThrowError(ModifierValueUndefinedError)
+    })
+
+    it('Should fail if starting from null or undefined', () => {
+      const source: Value<number> = {
+        _buildFrom: {
+          _modelPath: 'value'
+        },
+        _actions: [['string', 'uppercase', [], 'string']]
+      }
+
+      expect(() => resolveValue(source, { value: null }, [])).toThrowError(ModelValueUndefinedError)
+      expect(() => resolveValue(source, { value: undefined }, [])).toThrowError(ModelValueUndefinedError)
+      expect(() => resolveValue(source, { value: null }, [], { returnUndefined: true })).toBeNull()
+      expect(() => resolveValue(source, { value: undefined }, [], { returnUndefined: true })).toBeUndefined()
     })
   })
 })
