@@ -17,6 +17,14 @@ function callAllListeners (fns: Function | Function[], path: string, value: any)
   }
 }
 
+function eventIsNative (event: unknown): event is { target: {[k: string]: any} } {
+  if (typeof event === 'object' && event !== null && 'target' in event && typeof (event as any).target === 'object' && (event as any).target !== null) {
+    return true
+  } else {
+    return false
+  }
+}
+
 export default Vue.extend<IProps>({
   functional: true,
   name: 'widgetRenderer',
@@ -61,11 +69,16 @@ export default Vue.extend<IProps>({
         id: field.modelPath ? 'field--' + field.modelPath : undefined
       },
       on: {
-        [widgetBinding.eventName]: (event: any) => {
+        [widgetBinding.eventName]: (event: unknown) => {
           let value = event
 
-          if ('target' in event && 'value' in event.target) {
-            value = event.target.value
+          if (eventIsNative(event)) {
+            if ('value' in event.target) {
+              value = event.target.value
+            }
+            if ('checked' in event.target) {
+              value = event.target.checked
+            }
           }
 
           context.listeners.valueChanged && callAllListeners(context.listeners.valueChanged, field.modelPath!, value)
