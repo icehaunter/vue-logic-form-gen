@@ -15,7 +15,7 @@ export const prepareValidator = (model: any, context: Context) => (validator: Va
   if ('params' in validator) {
     let preparedParams: any = {}
     for (const [key, value] of Object.entries(validator.params)) {
-      preparedParams[key] = resolveValue(value, model, context)
+      preparedParams[key] = resolveValue(value, model, context, { returnUndefined: true })
     }
 
     predicate = validators[validator.type](preparedParams)

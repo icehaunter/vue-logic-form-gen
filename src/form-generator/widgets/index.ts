@@ -86,7 +86,7 @@ export function prepareWidget (
   if (widget.params !== undefined) {
     let preparedParams: any = {}
     for (const [key, value] of Object.entries(widget.params)) {
-      preparedParams[key] = resolveValue(value, model, context)
+      preparedParams[key] = resolveValue(value, model, context, { returnUndefined: true })
     }
     return {
       type: widget.type,

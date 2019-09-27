@@ -119,7 +119,7 @@ function prepareSwitchBranch (branch: Switch): PreparedBranch {
       returnUndefined: true
     })
 
-    const result = key !== undefined ? cases[key] : undefined
+    const result = key !== undefined && key !== null ? cases[key] : undefined
     if (result !== undefined) {
       return result
     } else {
@@ -167,7 +167,7 @@ function prepareForBranch (branch: For): PreparedBranch {
 
 /**
  * Prepare a level for resolution.
- * 
+ *
  * Level preparation means all the params, which need resolution as well
  * as preparation of all the children
  * @param level level for preparation
@@ -177,7 +177,16 @@ function prepareLevelBranch (level: Level): Prepared.Level {
     _tag: 'level',
     resolver: memoize((model, context) => ({
       ...level,
-      classList: level.classList && level.classList.map((val) => resolveValue(val, model, context)),
+      classList:
+        level.classList &&
+        level.classList
+          .map(val =>
+            resolveValue(val, model, context, { returnUndefined: true })
+          )
+          .filter(
+            <T>(v: T | undefined | null): v is T =>
+              v !== null && v !== undefined
+          ),
       children: level.children.map(v => prepareBranch(v))
     }))
   }
@@ -185,12 +194,12 @@ function prepareLevelBranch (level: Level): Prepared.Level {
 
 /**
  * Prepare a field for the resolution.
- * 
+ *
  * Field preparation means preparing all the moving parts:
  * - validations
  * - modelPath
  * - classList
- * 
+ *
  * @param field field for preparation
  */
 function prepareField (field: Field): Prepared.Field {
@@ -199,23 +208,42 @@ function prepareField (field: Field): Prepared.Field {
     resolver: memoize((model, context) => {
       /* Widget */
       const preparedWidget = prepareWidget(field.widget, model, context)
-      const preparedClassList = field.classList && field.classList.map((val) => resolveValue(val, model, context))
+      const preparedClassList =
+        field.classList &&
+        field.classList
+          .map(val =>
+            resolveValue(val, model, context, { returnUndefined: true })
+          )
+          .filter(
+            <T>(v: T | undefined | null): v is T =>
+              v !== null && v !== undefined
+          )
 
       /* Model */
-      const resolvedModelPath = field.modelPath !== undefined ? resolveContextPath(field.modelPath, context).join('.') : undefined
-      const appliedValidator = (resolvedModelPath && field.validation) ? prepareAppliedValidator(field.validation, model, context) : undefined
+      const resolvedModelPath =
+        field.modelPath !== undefined
+          ? resolveContextPath(field.modelPath, context).join('.')
+          : undefined
+      const appliedValidator =
+        resolvedModelPath && field.validation
+          ? prepareAppliedValidator(field.validation, model, context)
+          : undefined
 
-      const preparedValidations = !(field.modelPath && appliedValidator) ? undefined : memoize((model: any, context: Context) => {
-        const value = resolveModelPath(field.modelPath!, model, context)
-        return appliedValidator(value)
-      })
+      const preparedValidations = !(field.modelPath && appliedValidator)
+        ? undefined
+        : memoize((model: any, context: Context) => {
+          const value = resolveModelPath(field.modelPath!, model, context)
+          return appliedValidator(value)
+        })
 
       return {
         ...field,
         widget: preparedWidget,
         classList: preparedClassList,
         validation: preparedValidations,
-        modelPath: field.modelPath && resolveContextPath(field.modelPath, context).join('.')
+        modelPath:
+          field.modelPath &&
+          resolveContextPath(field.modelPath, context).join('.')
       }
     })
   }
