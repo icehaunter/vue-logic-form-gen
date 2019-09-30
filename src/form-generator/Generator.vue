@@ -9,12 +9,16 @@
           @valueChanged="doUpdate"
         />
       </template>
+      <template v-for="slot in availableSlots" v-slot:[slot]="scope">
+        <slot :name="slot" v-bind="scope" />
+      </template>
     </layout-builder>
   </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from 'vue'
+import cloneDeep from 'clone-deep'
 import LayoutBuilder from './layout/LayoutBuilder'
 import WidgetRenderer from './layout/WidgetRenderer'
 import { LogicalBranch } from './schema/types'
@@ -95,7 +99,8 @@ export default Vue.extend({
       return prepareBranch(this.schema)
     },
     cleanedModel (): any {
-      return JSON.parse(JSON.stringify(this.model))
+      // return JSON.parse(JSON.stringify(this.model))
+      return cloneDeep(this.model)
     },
     resolvedSchema (): ResolutionResult {
       // return resolveTree(this.preparedSchema, this.model)
@@ -121,6 +126,9 @@ export default Vue.extend({
     },
     validated (): { allValid: boolean; valid: number; total: number } {
       return getValidity(this.collectedValidators, this.errorLevels)
+    },
+    availableSlots (): string[] {
+      return Object.keys(this.$scopedSlots).filter(name => name !== 'field')
     }
   }
 })

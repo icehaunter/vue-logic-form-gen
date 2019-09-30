@@ -1,4 +1,4 @@
-import Generator from '../form-generator/Generator.vue'
+import Generator from './Generator.vue'
 import { registry as WidgetRegistry } from './widgets'
 import { BaseProps } from './widgets/types'
 import { LogicalBranch as SchemaBranch } from './schema/types'
