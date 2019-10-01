@@ -44,7 +44,7 @@ function buildLevelLayout (
     }
 
     if (`${branch.level}.footer` in context.scopedSlots) {
-      layout.unshift(
+      layout.push(
         h(
           'div',
           {
