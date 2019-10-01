@@ -17,8 +17,8 @@ function callAllListeners (fns: Function | Function[], path: string, value: any)
   }
 }
 
-function eventIsNative (event: unknown): event is { target: {[k: string]: any} } {
-  if (typeof event === 'object' && event !== null && 'target' in event && typeof (event as any).target === 'object' && (event as any).target !== null) {
+function eventIsNative (event: unknown): event is InputEvent {
+  if (event instanceof InputEvent) {
     return true
   } else {
     return false
@@ -73,11 +73,10 @@ export default Vue.extend<IProps>({
           let value = event
 
           if (eventIsNative(event)) {
-            if ('value' in event.target) {
-              value = event.target.value
-            }
-            if ('checked' in event.target) {
-              value = event.target.checked
+            if (event.target && ((event.target as HTMLInputElement).type === 'radio' && (event.target as HTMLInputElement).type === 'checkbox')) {
+              value = (event.target as HTMLInputElement).checked
+            } else if (event.target) {
+              value = (event.target as HTMLInputElement).value
             }
           }
 
