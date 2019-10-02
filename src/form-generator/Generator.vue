@@ -66,6 +66,14 @@ export default Vue.extend({
     }
   },
   components: { LayoutBuilder, WidgetRenderer },
+  watch: {
+    validated: {
+      handler (value) {
+        this.$emit('validity', value)
+      },
+      immediate: true
+    }
+  },
   methods: {
     validateAll () {
       for (const key of Object.keys(this.collectedValidators)) {
