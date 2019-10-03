@@ -26,4 +26,11 @@ describe('Modifier actions for boolean type', () => {
     expect(modifiers.xor(false, true)).toBe(true)
     expect(modifiers.xor(true, false)).toBe(true)
   })
+
+  it('should have a debug operator', () => {
+    console.log = jest.fn()
+
+    expect(modifiers.debug(true, 'log', 'Prefix')).toEqual(true)
+    expect(console.log).toHaveBeenCalledWith('Prefix', ':', true)
+  })
 })

@@ -46,4 +46,17 @@ describe('Modifier actions for date type', () => {
   it('should properly handle the "now" date tag', () => {
     expect(modifiers.isBefore(new Date('1996-01-01'), 'now')).toBe(true)
   })
+
+  it('should have a operator to get full year', () => {
+    expect(modifiers.getFullYear(new Date())).toEqual(new Date().getFullYear())
+  })
+
+  it('should have a debug operator', () => {
+    console.log = jest.fn()
+
+    const target = new Date()
+
+    expect(modifiers.debug(target, 'log', 'Prefix')).toEqual(target)
+    expect(console.log).toHaveBeenCalledWith('Prefix', ':', target)
+  })
 })

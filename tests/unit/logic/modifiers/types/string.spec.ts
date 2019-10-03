@@ -80,4 +80,13 @@ describe('Modifier actions for string type', () => {
     expect(otherDay.getDate()).toEqual(2)
     expect(otherDay.getMonth()).toEqual(0)
   })
+
+  it('should have a debug operator', () => {
+    console.log = jest.fn()
+
+    const target = 'test'
+
+    expect(modifiers.debug(target, 'log', 'Prefix')).toEqual(target)
+    expect(console.log).toHaveBeenCalledWith('Prefix', ':', target)
+  })
 })
