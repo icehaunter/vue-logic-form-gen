@@ -1,8 +1,9 @@
 import {
   resolveValue
-} from '@/components/form-generator/logic'
-import { Value } from '@/components/form-generator/logic/value'
-import { ModifierValueUndefinedError, ModelValueUndefinedError } from '@/components/form-generator/logic/errors'
+} from '@/form-generator/logic'
+import { Value } from '@/form-generator/logic/value'
+import { ModifierValueUndefinedError, ModelValueUndefinedError } from '@/form-generator/logic/errors'
+import { isBefore } from 'date-fns'
 
 describe('Value unwrapping', () => {
   describe('Basic types', () => {
@@ -130,6 +131,20 @@ describe('Value unwrapping', () => {
       expect(result).toBe(4)
     })
 
+    it('Should build a date from string, applying the modifiers', () => {
+      const source: Value<Date> = {
+        _buildFrom: 'now',
+        _actions: [
+          ['string', 'toDate', [], 'date'],
+          ['date', 'subtract', [4, 'day'], 'date']
+        ]
+      }
+
+      const result = resolveValue(source, {}, [])
+
+      expect(isBefore(result, new Date())).toBe(true)
+    })
+
     it('Should build from a model-sourced value, applying the modifiers', () => {
       const source: Value<number> = {
         _buildFrom: {
@@ -143,7 +158,7 @@ describe('Value unwrapping', () => {
       expect(result).toBe(4)
     })
 
-    it('Should fail if modifiers return undefined at any point', () => {
+    it('Should fail if modifiers return null or undefined at any point', () => {
       const source: Value<number> = {
         _buildFrom: {
           _modelPath: 'value'
@@ -152,6 +167,32 @@ describe('Value unwrapping', () => {
       }
 
       expect(() => resolveValue(source, { value: { from: 'to' } }, [])).toThrowError(ModifierValueUndefinedError)
+      expect(() => resolveValue(source, { value: { any: null } }, [])).toThrowError(ModifierValueUndefinedError)
+    })
+
+    it('Should fail if starting from null or undefined', () => {
+      const source: Value<number> = {
+        _buildFrom: {
+          _modelPath: 'value'
+        },
+        _actions: [['string', 'uppercase', [], 'string']]
+      }
+
+      expect(() => resolveValue(source, { value: null }, [])).toThrowError(ModelValueUndefinedError)
+      expect(() => resolveValue(source, { value: undefined }, [])).toThrowError(ModelValueUndefinedError)
+      expect(resolveValue(source, { value: null }, [], { returnUndefined: true })).toBeNull()
+      expect(resolveValue(source, { value: undefined }, [], { returnUndefined: true })).toBeUndefined()
+    })
+
+    it('Should throw any errors encountered', () => {
+      const source: Value<number> = {
+        _buildFrom: 1,
+        _actions: [['number', 'debug', [{
+          _modelPath: 'value'
+        }, 'prefix'], 'number']]
+      }
+
+      expect(() => resolveValue(source, { value: 'k' }, [], { returnUndefined: true })).toThrowError(TypeError)
     })
   })
 })

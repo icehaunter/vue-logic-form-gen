@@ -1,4 +1,4 @@
-import { modifiers } from '@/components/form-generator/logic/modifiers/type/object'
+import { modifiers } from '@/form-generator/logic/modifiers/type/object'
 
 describe('Modifier actions for object type', () => {
   it('should have a get-operator', () => {
@@ -17,5 +17,14 @@ describe('Modifier actions for object type', () => {
     expect(modifiers.path({ a: 1 }, 'a')).toBe(1)
     expect(modifiers.path({ a: { b: 1 } }, 'a.b')).toBe(1)
     expect(modifiers.path({ a: 1 }, 'a.b')).toBe(undefined)
+  })
+
+  it('should have a debug operator', () => {
+    console.log = jest.fn()
+
+    const target = { a: 1, b: 2 }
+
+    expect(modifiers.debug(target, 'log', 'Prefix')).toEqual(target)
+    expect(console.log).toHaveBeenCalledWith('Prefix', ':', target)
   })
 })

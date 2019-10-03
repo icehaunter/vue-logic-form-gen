@@ -1,4 +1,4 @@
-import { modifiers } from '@/components/form-generator/logic/modifiers/type/boolean'
+import { modifiers } from '@/form-generator/logic/modifiers/type/boolean'
 
 describe('Modifier actions for boolean type', () => {
   it('should have a not-operator', () => {
@@ -25,5 +25,12 @@ describe('Modifier actions for boolean type', () => {
     expect(modifiers.xor(false, false)).toBe(false)
     expect(modifiers.xor(false, true)).toBe(true)
     expect(modifiers.xor(true, false)).toBe(true)
+  })
+
+  it('should have a debug operator', () => {
+    console.log = jest.fn()
+
+    expect(modifiers.debug(true, 'log', 'Prefix')).toEqual(true)
+    expect(console.log).toHaveBeenCalledWith('Prefix', ':', true)
   })
 })

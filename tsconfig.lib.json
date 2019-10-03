@@ -12,6 +12,7 @@
     "baseUrl": ".",
     "declaration": true,
     "declarationDir": "dist",
+    "rootDir": "src/form-generator/",
     "types": [
       "webpack-env",
       "jest"
@@ -29,14 +30,21 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src/form-generator/**/*.ts",
+    "src/form-generator/**/*.tsx",
+    "src/form-generator/**/*.vue",
+    "src/form-generator/*.vue",
+    "src/form-generator/*.ts",
+
+    // "src/**/*.ts",
+    // "src/**/*.tsx",
+    // "src/**/*.vue",
+    // "tests/**/*.ts",
+    // "tests/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "**/*.spec.ts"
   ]
 }

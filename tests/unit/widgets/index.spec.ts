@@ -1,4 +1,4 @@
-import { registry, prepareWidget } from '@/components/form-generator/widgets'
+import { registry, prepareWidget } from '@/form-generator/widgets'
 
 describe('widget registry', () => {
   it('should properly register an expose a widget', () => {

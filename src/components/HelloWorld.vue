@@ -2,16 +2,20 @@
   <div class="hello">
     <div><label><input type="checkbox" v-model="model.value" />Value</label></div>
     <div><label><input type="checkbox" v-model="model.deeply.nested.value" />Deeply nested value</label></div>
-    <generator :model="model" :schema="schema" />
+    <generator :model="model" :schema="schema">
+      <template #test.header>
+        lol
+      </template>
+    </generator>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import Generator from './form-generator/Generator.vue'
-import { LogicalBranch } from './form-generator/schema/types'
-import './form-generator/widgets/basicWidgets/paragraph'
-import './form-generator/widgets/basicWidgets/input'
+import Generator from '../form-generator/Generator.vue'
+import { LogicalBranch } from '../form-generator/schema/types'
+import './basicWidgets/paragraph'
+import './basicWidgets/input'
 
 interface IData {
   model: any,
@@ -34,31 +38,35 @@ export default Vue.extend({
         value: true
       },
       schema: {
-        type: 'if',
-        predicate: {
-          _modelPath: 'value'
-        },
-        then: {
-          type: 'field',
-          modelPath: 'deeply.nested.text',
-          widget: {
-            type: 'basicInput',
-            params: {
-              type: {
-                _modelPath: 'inputType'
-              }
-            }
+        type: 'level',
+        level: 'test',
+        children: [{
+          type: 'if',
+          predicate: {
+            _modelPath: 'value'
           },
-          validation: [
-            {
-              type: 'required',
-              message: 'Value should not be "false"',
-              level: 'error',
-              runOnEmpty: true
+          then: {
+            type: 'field',
+            modelPath: 'deeply.nested.text',
+            widget: {
+              type: 'basicInput',
+              params: {
+                type: {
+                  _modelPath: 'inputType'
+                }
+              }
             },
-            { type: 'isTrue', message: 'should be true', level: 'info' }
-          ]
-        }
+            validation: [
+              {
+                type: 'required',
+                message: 'Value should not be "false"',
+                level: 'error',
+                runOnEmpty: true
+              },
+              { type: 'isTrue', message: 'should be true', level: 'info' }
+            ]
+          }
+        }]
       }
     }
   }

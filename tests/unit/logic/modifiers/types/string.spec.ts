@@ -1,4 +1,4 @@
-import { modifiers } from '@/components/form-generator/logic/modifiers/type/string'
+import { modifiers } from '@/form-generator/logic/modifiers/type/string'
 
 describe('Modifier actions for string type', () => {
   it('should have a join-operator', () => {
@@ -69,5 +69,24 @@ describe('Modifier actions for string type', () => {
     expect(modifiers.testRegex('abc', /^abc$/)).toBe(true)
     expect(modifiers.testRegex('abc', '^abc$')).toBe(true)
     expect(modifiers.testRegex('abc', 'bbb')).toBe(false)
+  })
+
+  it('should convert to date', () => {
+    const day = modifiers.toDate('now')
+    expect(day.getFullYear()).toEqual(new Date().getFullYear())
+
+    const otherDay = modifiers.toDate('2019-01-02')
+    expect(otherDay.getFullYear()).toEqual(2019)
+    expect(otherDay.getDate()).toEqual(2)
+    expect(otherDay.getMonth()).toEqual(0)
+  })
+
+  it('should have a debug operator', () => {
+    console.log = jest.fn()
+
+    const target = 'test'
+
+    expect(modifiers.debug(target, 'log', 'Prefix')).toEqual(target)
+    expect(console.log).toHaveBeenCalledWith('Prefix', ':', target)
   })
 })

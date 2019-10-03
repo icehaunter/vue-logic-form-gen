@@ -1,8 +1,8 @@
 import {
   ModifierChain,
   resolveModifierChain
-} from '@/components/form-generator/logic/modifiers'
-import { ValueUndefinedError } from '@/components/form-generator/logic/errors'
+} from '@/form-generator/logic/modifiers'
+import { ValueUndefinedError } from '@/form-generator/logic/errors'
 
 describe('Modifier chain resolution', () => {
   it('should resolve a basic modifier chain from one link', () => {
@@ -53,5 +53,12 @@ describe('Modifier chain resolution', () => {
       ['number', 'double', [], 'number']
     ]
     expect(() => resolveModifierChain({}, chain, {}, [])).toThrowError(ValueUndefinedError)
+  })
+
+  it('should try and convert string to a date object if modifier chain expects a date as its first parameter', () => {
+    const chain: ModifierChain<'date'> = [
+      ['date', 'getFullYear', [], 'number']
+    ]
+    expect(resolveModifierChain<any>('now', chain, {}, [])).toEqual(new Date().getFullYear())
   })
 })

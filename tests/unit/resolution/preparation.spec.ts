@@ -1,5 +1,5 @@
-import { prepareBranch } from '@/components/form-generator/resolution'
-import { Prepared } from '@/components/form-generator/resolution/types'
+import { prepareBranch } from '@/form-generator/resolution'
+import { Prepared } from '@/form-generator/resolution/types'
 
 describe('prepareBranch', () => {
   it('should prepare a simple branch', () => {

@@ -1,4 +1,4 @@
-import { modifiers } from '@/components/form-generator/logic/modifiers/type/number'
+import { modifiers } from '@/form-generator/logic/modifiers/type/number'
 
 describe('Modifier actions for number type', () => {
   it('should have a add-operator', () => {
@@ -33,5 +33,42 @@ describe('Modifier actions for number type', () => {
     expect(modifiers.toString(1)).toBe('1')
     expect(modifiers.toString(2)).toBe('2')
     expect(modifiers.toString(-2)).toBe('-2')
+  })
+
+  it('should have a comparison operator: eq', () => {
+    expect(modifiers.eq(5, 5)).toBe(true)
+    expect(modifiers.eq(5, 7)).toBe(false)
+    expect(modifiers.eq(5, 3)).toBe(false)
+  })
+
+  it('should have a comparison operator: lt', () => {
+    expect(modifiers.lt(5, 5)).toBe(false)
+    expect(modifiers.lt(5, 7)).toBe(true)
+    expect(modifiers.lt(5, 3)).toBe(false)
+  })
+
+  it('should have a comparison operator: lte', () => {
+    expect(modifiers.lte(5, 5)).toBe(true)
+    expect(modifiers.lte(5, 7)).toBe(true)
+    expect(modifiers.lte(5, 3)).toBe(false)
+  })
+
+  it('should have a comparison operator: gt', () => {
+    expect(modifiers.gt(5, 5)).toBe(false)
+    expect(modifiers.gt(5, 7)).toBe(false)
+    expect(modifiers.gt(5, 3)).toBe(true)
+  })
+
+  it('should have a comparison operator: gte', () => {
+    expect(modifiers.gte(5, 5)).toBe(true)
+    expect(modifiers.gte(5, 7)).toBe(false)
+    expect(modifiers.gte(5, 3)).toBe(true)
+  })
+
+  it('should have a debug operator', () => {
+    console.log = jest.fn()
+
+    expect(modifiers.debug(1, 'log', 'Prefix')).toEqual(1)
+    expect(console.log).toHaveBeenCalledWith('Prefix', ':', 1)
   })
 })
