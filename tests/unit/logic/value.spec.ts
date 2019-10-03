@@ -183,5 +183,16 @@ describe('Value unwrapping', () => {
       expect(resolveValue(source, { value: null }, [], { returnUndefined: true })).toBeNull()
       expect(resolveValue(source, { value: undefined }, [], { returnUndefined: true })).toBeUndefined()
     })
+
+    it('Should throw any errors encountered', () => {
+      const source: Value<number> = {
+        _buildFrom: 1,
+        _actions: [['number', 'debug', [{
+          _modelPath: 'value'
+        }, 'prefix'], 'number']]
+      }
+
+      expect(() => resolveValue(source, { value: 'k' }, [], { returnUndefined: true })).toThrowError(TypeError)
+    })
   })
 })

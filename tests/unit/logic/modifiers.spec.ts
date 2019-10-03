@@ -54,4 +54,11 @@ describe('Modifier chain resolution', () => {
     ]
     expect(() => resolveModifierChain({}, chain, {}, [])).toThrowError(ValueUndefinedError)
   })
+
+  it('should try and convert string to a date object if modifier chain expects a date as its first parameter', () => {
+    const chain: ModifierChain<'date'> = [
+      ['date', 'getFullYear', [], 'number']
+    ]
+    expect(resolveModifierChain<any>('now', chain, {}, [])).toEqual(new Date().getFullYear())
+  })
 })
